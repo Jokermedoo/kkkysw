@@ -155,7 +155,7 @@ const ModernServices: React.FC = () => {
           </h2>
 
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
-            احصل على حساباتك المالية الرقمية من منصة واحدة موثوقة مع أفضل الأسعار وأسرع خدمة
+            احصل على حساباتك المالية الرقمية من منصة واحدة موثوقة مع أفضل الأسعار وأسرع خدم��
           </p>
 
           {/* زر عرض جميع الخدمات */}
@@ -381,7 +381,7 @@ const ModernServices: React.FC = () => {
 
         {/* زر عرض المزيد */}
         {visibleCount < services.filter(s => s.active).length && (
-          <div 
+          <div
             className={`text-center transition-all duration-1000 ${
               isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
             }`}
@@ -390,11 +390,13 @@ const ModernServices: React.FC = () => {
             <Button
               variant="secondary"
               size="lg"
-              icon={ChevronRight}
+              icon={Eye}
               iconPosition="right"
-              onClick={() => setVisibleCount(prev => prev + 8)}
+              onClick={() => setIsModalOpen(true)}
+              className="group"
             >
-              عرض المزيد من الخدمات ({services.filter(s => s.active).length - visibleCount})
+              عرض جميع الخدمات ({services.filter(s => s.active).length})
+              <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
             </Button>
           </div>
         )}
