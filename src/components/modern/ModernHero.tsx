@@ -20,9 +20,9 @@ const ModernHero: React.FC = () => {
   const parallaxY = mounted ? (mousePosition.y - window.innerHeight / 2) * 0.02 : 0;
 
   const features = [
-    { icon: Zap, text: 'تسليم فوري', color: 'text-yellow-500' },
+    { icon: Zap, text: 'تسليم سريع', color: 'text-yellow-500' },
     { icon: Shield, text: 'أمان عالي', color: 'text-green-500' },
-    { icon: Star, text: 'جودة مضمونة', color: 'text-purple-500' }
+    { icon: Star, text: 'جودة ممتازة', color: 'text-purple-500' }
   ];
 
   return (
@@ -76,7 +76,7 @@ const ModernHero: React.FC = () => {
                 ))}
               </div>
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                المنصة الأولى في المنطقة
+                ا��منصة الأولى في المنطقة
               </span>
               <Sparkles className="w-4 h-4 text-blue-600 animate-spin" />
             </div>
@@ -192,7 +192,7 @@ const ModernHero: React.FC = () => {
             </div>
           </div>
 
-          {/* العناصر البصرية التفاعلية */}
+          {/* العناصر البصر��ة التفاعلية */}
           <div 
             className={`relative transition-all duration-1000 ${
               isInView ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'
