@@ -120,8 +120,8 @@ const ModernCTA: React.FC = () => {
               },
               {
                 icon: Shield,
-                title: 'ضمان مدى الحياة',
-                description: 'حماية كاملة وضمان شامل لجميع خدماتنا',
+                title: 'أمان عالي',
+                description: 'حماية كاملة وأمان متقدم لجميع خدماتنا',
                 color: 'from-green-400 to-blue-400'
               },
               {
