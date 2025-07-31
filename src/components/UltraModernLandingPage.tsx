@@ -3,7 +3,9 @@ import { MessageCircle } from 'lucide-react';
 import ModernHeader from './modern/ModernHeader';
 import ModernFooter from './modern/ModernFooter';
 import ModernHero from './modern/ModernHero';
-import MagicalServices from './modern/MagicalServices';
+import EnhancedMagicalServices from './modern/EnhancedMagicalServices';
+import InteractiveFeatures from './modern/InteractiveFeatures';
+import TestimonialsSection from './modern/TestimonialsSection';
 import ModernCTA from './modern/ModernCTA';
 import { useTheme } from '../context/ThemeContext';
 
