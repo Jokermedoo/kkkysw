@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { DataProvider } from './context/DataContext';
 import { ThemeProvider } from './context/ThemeContext';
-import SimpleWhatsAppLanding from './components/SimpleWhatsAppLanding';
+import UltraModernLandingPage from './components/UltraModernLandingPage';
 import ImprovedAdminPanel from './components/admin/ImprovedAdminPanel';
 import LoginForm from './components/admin/LoginForm';
 
