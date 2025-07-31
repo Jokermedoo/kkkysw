@@ -9,6 +9,7 @@ import {
   Settings, Bell, Shield, Activity, Target, Award, Globe
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
+import CustomizationManager from './CustomizationManager';
 
 const EnhancedAdminPanel: React.FC = () => {
   const { 
@@ -69,7 +70,8 @@ const EnhancedAdminPanel: React.FC = () => {
     { id: 'orders', name: 'إدارة الطلبات', icon: Users },
     { id: 'payments', name: 'طرق الدفع', icon: DollarSign },
     { id: 'settings', name: 'إعدادات الموقع', icon: Settings },
-    { id: 'analytics', name: 'التحليلات', icon: TrendingUp }
+    { id: 'analytics', name: 'التحليلات', icon: TrendingUp },
+    { id: 'customization', name: 'إدارة التخصيص', icon: Settings }
   ];
 
   const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
@@ -577,6 +579,7 @@ const EnhancedAdminPanel: React.FC = () => {
           {activeTab === 'payments' && renderPayments()}
           {activeTab === 'settings' && renderSettings()}
           {activeTab === 'analytics' && renderAnalytics()}
+          {activeTab === 'customization' && <CustomizationManager />}
         </main>
       </div>
     </div>
