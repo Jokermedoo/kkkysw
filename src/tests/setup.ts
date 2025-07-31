@@ -30,8 +30,8 @@ beforeAll(() => {
       matches: false,
       media: query,
       onchange: null,
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
       dispatchEvent: vi.fn(),
@@ -73,13 +73,12 @@ beforeAll(() => {
     value: localStorageMock,
   });
 
-  // Mock URL.createObjectURL
+  // Mock URL methods
   Object.defineProperty(window.URL, 'createObjectURL', {
     writable: true,
     value: vi.fn(() => 'mocked-url'),
   });
 
-  // Mock URL.revokeObjectURL
   Object.defineProperty(window.URL, 'revokeObjectURL', {
     writable: true,
     value: vi.fn(),
@@ -88,7 +87,7 @@ beforeAll(() => {
   // Mock fetch
   global.fetch = vi.fn();
 
-  // Mock navigator
+  // Mock navigator clipboard
   Object.defineProperty(navigator, 'clipboard', {
     value: {
       writeText: vi.fn().mockResolvedValue(undefined),
@@ -98,7 +97,7 @@ beforeAll(() => {
   });
 });
 
-// Mock environment variables
+// Mock Supabase
 vi.mock('../lib/supabase', () => ({
   supabase: {
     from: vi.fn().mockReturnValue({
@@ -144,34 +143,24 @@ vi.mock('react-hot-toast', () => ({
     loading: vi.fn(),
     dismiss: vi.fn(),
   },
-  Toaster: ({ children }: { children?: React.ReactNode }) => children,
+  Toaster: () => null,
 }));
 
 // Mock recharts
 vi.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="responsive-container">{children}</div>
-  ),
-  BarChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="bar-chart">{children}</div>
-  ),
-  Bar: () => <div data-testid="bar" />,
-  XAxis: () => <div data-testid="x-axis" />,
-  YAxis: () => <div data-testid="y-axis" />,
-  CartesianGrid: () => <div data-testid="cartesian-grid" />,
-  Tooltip: () => <div data-testid="tooltip" />,
-  Legend: () => <div data-testid="legend" />,
-  LineChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="line-chart">{children}</div>
-  ),
-  Line: () => <div data-testid="line" />,
-  PieChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="pie-chart">{children}</div>
-  ),
-  Pie: () => <div data-testid="pie" />,
-  Cell: () => <div data-testid="cell" />,
-  AreaChart: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="area-chart">{children}</div>
-  ),
-  Area: () => <div data-testid="area" />,
+  ResponsiveContainer: () => null,
+  BarChart: () => null,
+  Bar: () => null,
+  XAxis: () => null,
+  YAxis: () => null,
+  CartesianGrid: () => null,
+  Tooltip: () => null,
+  Legend: () => null,
+  LineChart: () => null,
+  Line: () => null,
+  PieChart: () => null,
+  Pie: () => null,
+  Cell: () => null,
+  AreaChart: () => null,
+  Area: () => null,
 }));
