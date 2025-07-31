@@ -1,23 +1,36 @@
-import { supabase, DatabaseService, DatabasePaymentMethod, DatabaseOrder, DatabaseSiteSettings } from '../lib/supabase';
+import { supabase, DatabaseService, DatabasePaymentMethod, DatabaseOrder, DatabaseSiteSettings, handleSupabaseError } from '../lib/supabase';
 import { Service, PaymentMethod, Order, SiteSettings } from '../context/DataContext';
 
 // خدمات قاعدة البيانات للخدمات
 export const servicesService = {
   async getAll(): Promise<Service[]> {
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .order('order_index', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('order_index', { ascending: true });
 
-    if (error) throw error;
+      if (error) {
+        console.error('Services fetch error:', error);
+        throw new Error(handleSupabaseError(error));
+      }
 
-    return data.map((item: DatabaseService) => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      order: item.order_index,
-      active: item.active
-    }));
+      if (!data) {
+        console.warn('No services data returned');
+        return [];
+      }
+
+      return data.map((item: DatabaseService) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        order: item.order_index,
+        active: item.active
+      }));
+    } catch (error) {
+      console.error('Error in servicesService.getAll:', error);
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async create(service: Omit<Service, 'id'>): Promise<Service> {
