@@ -112,8 +112,7 @@ const ModernHero: React.FC = () => {
               <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl">
                 احصل على{' '}
                 <span className="text-blue-600 dark:text-blue-400 font-semibold">حساباتك المالية الرقمية</span>
-                {' '}بسرعة وأمان من منصة واحدة موثوقة مع{' '}
-                <span className="text-purple-600 dark:text-purple-400 font-semibold">ضمان مدى الحياة</span>
+                {' '}بسرعة وأمان من منصة واحدة موثوقة
               </p>
             </div>
 
