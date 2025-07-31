@@ -16,6 +16,15 @@ export default {
         'float': 'float 3s ease-in-out infinite',
         'pulse-glow': 'pulseGlow 2s infinite',
         'gradient-shift': 'gradientShift 3s ease infinite',
+        'blob': 'blob 7s infinite',
+        'gradient-x': 'gradient-x 15s ease infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+        'spin-slow': 'spin 3s linear infinite',
+        'wiggle': 'wiggle 1s ease-in-out infinite',
+        'shake': 'shake 0.5s ease-in-out infinite',
+        'flip': 'flip 1s ease-in-out infinite',
+        'rotate-y': 'rotateY 2s ease-in-out infinite',
+        'scale-pulse': 'scalePulse 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
