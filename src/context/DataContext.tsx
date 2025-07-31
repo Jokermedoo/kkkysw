@@ -131,7 +131,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setServices(prev => prev.map(s => s.id === id ? { ...s, ...service } : s));
       toast.success('تم تحديث الخدمة بنجاح');
     } catch (err) {
-      toast.error('فشل في تحديث الخدمة');
+      toast.error('ف��ل في تحديث الخدمة');
     }
   };
 
@@ -217,6 +217,13 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     error,
     addOrder,
     refreshData,
+    updateService,
+    addService,
+    deleteService,
+    updatePaymentMethod,
+    addPaymentMethod,
+    deletePaymentMethod,
+    updateSiteSettings,
   };
 
   return (
