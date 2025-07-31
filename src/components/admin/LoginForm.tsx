@@ -3,7 +3,7 @@ import { Shield, Eye, EyeOff, Lock } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface LoginFormProps {
-  onLogin: () => void;
+  onLogin: (success: boolean) => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
