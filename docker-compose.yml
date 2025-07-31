@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  kyctrust-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - kyctrust-network
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - kyctrust-web
+    restart: unless-stopped
+    networks:
+      - kyctrust-network
+
+networks:
+  kyctrust-network:
+    driver: bridge
+
+volumes:
+  kyctrust-data:
