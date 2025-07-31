@@ -35,7 +35,7 @@ export function useSupabaseQuery<T>(
       const { data, error } = await queryBuilder;
       
       if (error) {
-        throw error;
+        throw new Error(handleSupabaseError(error));
       }
       
       setState({
@@ -98,7 +98,7 @@ export function useSupabaseInsert<T>(table: string) {
         .insert(data);
       
       if (error) {
-        throw error;
+        throw new Error(handleSupabaseError(error));
       }
       
       setState({ loading: false, error: null, success: true });
@@ -143,7 +143,7 @@ export function useSupabaseUpdate<T>(table: string) {
         .eq('id', id);
       
       if (error) {
-        throw error;
+        throw new Error(handleSupabaseError(error));
       }
       
       setState({ loading: false, error: null, success: true });
@@ -188,7 +188,7 @@ export function useSupabaseDelete(table: string) {
         .eq('id', id);
       
       if (error) {
-        throw error;
+        throw new Error(handleSupabaseError(error));
       }
       
       setState({ loading: false, error: null, success: true });
@@ -311,7 +311,7 @@ export function handleSupabaseError(error: PostgrestError | Error | null): strin
       case 'PGRST301':
         return 'غير مصرح بالوصول';
       case '23505':
-        return 'البيانات موجودة بالفعل';
+        return 'البيانا�� موجودة بالفعل';
       case '23503':
         return 'لا يمكن حذف هذا العنصر';
       default:
