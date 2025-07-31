@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import LandingPage from './components/LandingPage';
 import AdminPanel from './components/AdminPanel';
 import SystemMonitor from './components/SystemMonitor';
+import DatabaseManagement from './components/DatabaseManagement';
 import { DataProvider } from './context/DataContext';
 
 function App() {
