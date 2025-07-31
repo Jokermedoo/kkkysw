@@ -429,6 +429,12 @@ const ModernServices: React.FC = () => {
           })}
         </div>
       </div>
+
+      {/* Services Modal */}
+      <ServicesModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 };
