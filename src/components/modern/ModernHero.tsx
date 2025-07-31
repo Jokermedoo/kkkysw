@@ -20,7 +20,7 @@ const ModernHero: React.FC = () => {
   const parallaxY = mounted ? (mousePosition.y - window.innerHeight / 2) * 0.02 : 0;
 
   const features = [
-    { icon: Zap, text: 'تسليم ��وري', color: 'text-yellow-500' },
+    { icon: Zap, text: 'تسليم فوري', color: 'text-yellow-500' },
     { icon: Shield, text: 'أمان عالي', color: 'text-green-500' },
     { icon: Star, text: 'جودة مضمونة', color: 'text-purple-500' }
   ];
@@ -140,7 +140,7 @@ const ModernHero: React.FC = () => {
             </div>
 
             {/* أزرار العمل */}
-            <div 
+            <div
               className={`flex flex-col sm:flex-row gap-4 transition-all duration-700 ${
                 isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
               }`}
@@ -157,14 +157,15 @@ const ModernHero: React.FC = () => {
               >
                 ابدأ رحلتك الآن
               </Button>
-              
+
               <Button
-                variant="ghost"
+                variant="secondary"
                 size="xl"
-                icon={Play}
+                icon={MessageCircle}
                 className="group"
+                onClick={() => window.open('https://wa.me/201062453344?text=مرحباً، أريد الاستفسار عن خدماتكم', '_blank')}
               >
-                شاهد كيف يعمل
+                تواصل معنا مباشرة
               </Button>
             </div>
 
