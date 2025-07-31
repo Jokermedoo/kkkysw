@@ -301,7 +301,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       saveToStorage('kyctrust_services', updatedServices);
       toast.success('تم تحديث الخدمة بنجاح');
     } catch (err) {
-      console.error('Error updating service:', err);
+      console.error('Error updating service:', handleSupabaseError(err));
       toast.error('حدث خطأ في تحديث الخدمة');
     }
   };
@@ -353,7 +353,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('تم تحديث طريقة الدفع بنجاح');
     } catch (err) {
       console.error('Error updating payment method:', err);
-      toast.error('حدث خطأ في تحديث طريقة الدفع');
+      toast.error('حدث خطأ في تح��يث طريقة الدفع');
     }
   };
 
