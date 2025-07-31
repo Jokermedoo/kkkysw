@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import { DataProvider } from './context/DataContext';
 import { ThemeProvider } from './context/ThemeContext';
-import NewLandingPage from './components/NewLandingPage';
-import EnhancedAdminPanel from './components/admin/EnhancedAdminPanel';
+import ImprovedLandingPage from './components/ImprovedLandingPage';
+import ImprovedAdminPanel from './components/admin/ImprovedAdminPanel';
 import LoginForm from './components/admin/LoginForm';
 
 function App() {
