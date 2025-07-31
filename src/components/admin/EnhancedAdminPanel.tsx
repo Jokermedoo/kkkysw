@@ -12,7 +12,11 @@ import { useData } from '../../context/DataContext';
 import CustomizationManager from './CustomizationManager';
 import DatabaseManager from './DatabaseManager';
 
-const EnhancedAdminPanel: React.FC = () => {
+interface EnhancedAdminPanelProps {
+  onLogout?: () => void;
+}
+
+const EnhancedAdminPanel: React.FC<EnhancedAdminPanelProps> = ({ onLogout }) => {
   const { 
     services, paymentMethods, orders, siteSettings, 
     updateService, addService, deleteService,
