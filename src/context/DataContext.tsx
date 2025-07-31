@@ -240,7 +240,8 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw dbError;
       }
     } catch (err) {
-      console.log('📦 Using fallback/cached data due to:', handleSupabaseError(err));
+      const errorMessage = handleSupabaseError(err);
+      console.log('📦 Using fallback/cached data due to:', errorMessage);
 
       // استخدم البيانات المحفوظة محلياً أو البيانات الافتراضية
       const savedServices = localStorage.getItem('kyctrust_services');
@@ -274,7 +275,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('✅ Using cached data successfully');
       } else {
         setError('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
-        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا����ات المحلية');
+        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا��ات المحلية');
       }
     } finally {
       setLoading(false);
@@ -314,7 +315,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('تم تحديث الخدمة بنجاح');
     } catch (err) {
       console.error('Error updating service:', handleSupabaseError(err));
-      toast.error('حدث خطأ في ت��ديث الخدمة');
+      toast.error('حدث خطأ في تحديث الخدمة');
     }
   };
 
@@ -427,7 +428,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('تم إرسال الطلب بنجاح! سيتم التواصل معك قريباً');
     } catch (err) {
       console.error('Error adding order:', err);
-      toast.error('حدث خطأ في إرسال الطلب');
+      toast.error('ح��ث خطأ في إرسال الطلب');
     }
   };
 
