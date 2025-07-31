@@ -7,6 +7,7 @@ import ErrorMessage from './ErrorMessage';
 import SearchAndFilter from './SearchAndFilter';
 import StatsCard from './StatsCard';
 import ContactSection from './ContactSection';
+import TrustSection from './TrustSection';
 
 const LandingPage: React.FC = () => {
   const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
@@ -398,6 +399,9 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Trust Section */}
+      <TrustSection />
 
       {/* Contact Section */}
       <ContactSection />
