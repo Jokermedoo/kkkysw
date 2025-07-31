@@ -1,219 +1,134 @@
-import React, { useState, useEffect } from 'react';
-import { MessageCircle, X, Phone, Users, Clock } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageCircle, X, Phone, Send } from 'lucide-react';
 
-interface FloatingWhatsAppProps {
-  phoneNumber?: string;
-  message?: string;
-  position?: 'left' | 'right';
-  showPopup?: boolean;
-}
+const FloatingWhatsApp: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState('');
 
-const FloatingWhatsApp: React.FC<FloatingWhatsAppProps> = ({
-  phoneNumber = '201062453344',
-  message = 'السلام عليكم، أريد الاستفسار عن خدماتكم',
-  position = 'right',
-  showPopup = true
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [showChatPopup, setShowChatPopup] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const whatsappNumber = '201062453344';
+  const defaultMessage = 'مرحباً، أريد الاستفسار عن خدماتكم المالية';
 
-  useEffect(() => {
-    // إظهار الزر بعد 2 ثانية من تحميل الصفحة
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-      // إظهار popup الترحيب بعد 5 ثوان
-      if (showPopup) {
-        setTimeout(() => {
-          setShowChatPopup(true);
-          setHasAnimated(true);
-          // إخفاء popup بعد 10 ثوان
-          setTimeout(() => {
-            setShowChatPopup(false);
-          }, 10000);
-        }, 3000);
-      }
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [showPopup]);
-
-  const handleWhatsAppClick = () => {
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
-    
-    // إخفاء popup عند النقر
-    setShowChatPopup(false);
+  const sendMessage = (customMessage?: string) => {
+    const messageText = customMessage || message || defaultMessage;
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(messageText)}`;
+    window.open(url, '_blank');
+    setIsOpen(false);
+    setMessage('');
   };
 
-  const handlePopupClose = () => {
-    setShowChatPopup(false);
-  };
-
-  if (!isVisible) return null;
+  const quickMessages = [
+    'أريد الاستفسار عن خدمة Payoneer',
+    'ما هي طرق الدفع المتاحة؟',
+    'كم يستغرق وقت التسليم؟',
+    'هل ي��جد ضمان على الخدمات؟'
+  ];
 
   return (
     <>
-      {/* زر واتساب العائم */}
-      <div
-        className={`fixed bottom-6 z-50 ${
-          position === 'right' ? 'right-6' : 'left-6'
-        } transition-all duration-500 ${
-          isVisible ? 'transform translate-y-0 opacity-100' : 'transform translate-y-16 opacity-0'
-        }`}
-      >
-        <div className="relative">
-          {/* مؤشر الرسائل الجديدة */}
-          <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-            <span className="text-white text-xs font-bold">1</span>
-          </div>
-          
-          {/* الزر الرئيسي */}
-          <button
-            onClick={handleWhatsAppClick}
-            className="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 transform hover:scale-110 animate-bounce"
-            aria-label="تواصل عبر واتساب"
-          >
-            <MessageCircle className="w-8 h-8 text-white" />
-          </button>
-          
-          {/* تأثير النبضة */}
-          <div className="absolute inset-0 w-16 h-16 bg-green-400 rounded-full animate-ping opacity-20"></div>
-        </div>
-      </div>
-
-      {/* نافذة الدردشة المنبثقة */}
-      {showChatPopup && (
-        <div
-          className={`fixed bottom-28 z-40 ${
-            position === 'right' ? 'right-6' : 'left-6'
-          } w-80 max-w-sm animate-slide-up`}
-        >
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-            {/* رأس النافذة */}
-            <div className="bg-green-500 px-4 py-3 flex items-center justify-between">
-              <div className="flex items-center space-x-reverse space-x-3">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-24 left-6 bg-white rounded-2xl shadow-2xl border border-gray-200 w-80 z-50 animate-slide-up">
+          <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-t-2xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="bg-white bg-opacity-20 p-2 rounded-full">
+                  <MessageCircle className="h-5 w-5" />
                 </div>
                 <div>
-                  <h3 className="text-white font-semibold text-sm">دعم KYCtrust</h3>
-                  <div className="flex items-center space-x-reverse space-x-1">
-                    <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
-                    <span className="text-green-100 text-xs">متصل الآن</span>
-                  </div>
+                  <h3 className="font-semibold">KYCtrust Support</h3>
+                  <p className="text-sm opacity-90">متاح الآن للمساعدة</p>
                 </div>
               </div>
               <button
-                onClick={handlePopupClose}
-                className="text-white/80 hover:text-white transition-colors"
+                onClick={() => setIsOpen(false)}
+                className="text-white hover:bg-white hover:bg-opacity-20 p-1 rounded-full transition-colors"
               >
-                <X className="w-4 h-4" />
+                <X className="h-5 w-5" />
               </button>
             </div>
+          </div>
 
-            {/* محتوى النافذ�� */}
-            <div className="p-4">
-              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
-                <div className="flex items-start space-x-reverse space-x-2">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Users className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-gray-800 text-sm leading-relaxed">
-                      👋 أهلاً وسهلاً بك في KYCtrust!
-                      <br />
-                      كيف يمكننا مساعدتك اليوم؟
-                    </p>
-                  </div>
-                </div>
-              </div>
+          <div className="p-4 space-y-4">
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-sm text-gray-700">
+                👋 مرحباً! كيف يمكننا مساعدتك اليوم؟
+              </p>
+            </div>
 
-              {/* معلومات سريعة */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center space-x-reverse space-x-2 text-xs text-gray-600">
-                  <Clock className="w-3 h-3" />
-                  <span>نجيب خلال دقائق</span>
-                </div>
-                <div className="flex items-center space-x-reverse space-x-2 text-xs text-gray-600">
-                  <Phone className="w-3 h-3" />
-                  <span>دعم 24/7 متاح</span>
-                </div>
-              </div>
-
-              {/* زر البدء */}
-              <button
-                onClick={handleWhatsAppClick}
-                className="w-full bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl transition-colors flex items-center justify-center space-x-reverse space-x-2 font-medium"
-              >
-                <MessageCircle className="w-4 h-4" />
-                <span>ابدأ المحادثة</span>
-              </button>
-
-              {/* رسائل سريعة */}
-              <div className="mt-3 space-y-1">
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+                رسائل سريعة
+              </p>
+              {quickMessages.map((msg, index) => (
                 <button
-                  onClick={() => {
-                    const quickMessage = encodeURIComponent('أريد الاستفسار عن الأسعار');
-                    window.open(`https://wa.me/${phoneNumber}?text=${quickMessage}`, '_blank');
-                  }}
-                  className="w-full text-left text-xs text-gray-600 hover:text-green-600 py-1 px-2 rounded hover:bg-green-50 transition-colors"
+                  key={index}
+                  onClick={() => sendMessage(msg)}
+                  className="w-full text-left p-2 text-sm bg-green-50 hover:bg-green-100 rounded-lg transition-colors text-green-800"
                 >
-                  💰 استفسار عن الأسعار
+                  {msg}
                 </button>
+              ))}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide">
+                أو اكتب رسالتك
+              </label>
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="اكتب رسالتك هنا..."
+                  className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                />
                 <button
-                  onClick={() => {
-                    const quickMessage = encodeURIComponent('أريد طلب خدمة جديدة');
-                    window.open(`https://wa.me/${phoneNumber}?text=${quickMessage}`, '_blank');
-                  }}
-                  className="w-full text-left text-xs text-gray-600 hover:text-green-600 py-1 px-2 rounded hover:bg-green-50 transition-colors"
+                  onClick={() => sendMessage()}
+                  className="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition-colors"
                 >
-                  🛒 طلب خدمة جديدة
-                </button>
-                <button
-                  onClick={() => {
-                    const quickMessage = encodeURIComponent('أريد الدعم الفني');
-                    window.open(`https://wa.me/${phoneNumber}?text=${quickMessage}`, '_blank');
-                  }}
-                  className="w-full text-left text-xs text-gray-600 hover:text-green-600 py-1 px-2 rounded hover:bg-green-50 transition-colors"
-                >
-                  🔧 دعم فني
+                  <Send className="h-4 w-4" />
                 </button>
               </div>
             </div>
 
-            {/* مؤشر الكتابة */}
-            <div className="px-4 pb-3">
-              <div className="flex items-center space-x-reverse space-x-2 text-xs text-gray-500">
-                <div className="flex space-x-1">
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-1 h-1 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                </div>
-                <span>فريق الدعم يكتب...</span>
-              </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => sendMessage()}
+                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center justify-center space-x-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                <span>فتح واتساب</span>
+              </button>
+              <button
+                onClick={() => window.open(`tel:+${whatsappNumber}`, '_self')}
+                className="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Phone className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* أنيميشن CSS */}
-      <style jsx>{`
-        @keyframes slide-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.3s ease-out;
-        }
-      `}</style>
+      {/* Floating Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="fixed bottom-6 left-6 bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-110 transition-all duration-300 z-40 animate-bounce-slow"
+      >
+        {isOpen ? (
+          <X className="h-6 w-6" />
+        ) : (
+          <MessageCircle className="h-6 w-6" />
+        )}
+      </button>
+
+      {/* Notification Dot */}
+      {!isOpen && (
+        <div className="fixed bottom-[72px] left-[72px] bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center z-50 animate-pulse">
+          1
+        </div>
+      )}
     </>
   );
 };
