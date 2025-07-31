@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import toast from 'react-hot-toast';
 import { servicesService, paymentMethodsService, ordersService, siteSettingsService } from '../services/database';
+import { testSupabaseConnection, handleSupabaseError } from '../lib/supabase';
 
 export interface Service {
   id: string;
@@ -108,37 +109,74 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // جرب تحميل البيانات من قاعدة البيانات مع timeout
-      const loadDataWithTimeout = (promise: Promise<any>, timeout = 5000) => {
+      // فحص الاتصال أولاً
+      const connectionTest = await testSupabaseConnection();
+
+      if (!connectionTest.success) {
+        console.warn('⚠��� Supabase connection failed, using fallback data');
+        throw new Error(connectionTest.error || 'Connection failed');
+      }
+
+      // تحميل البيانات مع timeout محسن
+      const loadDataWithTimeout = (promise: Promise<any>, timeout = 8000) => {
         return Promise.race([
           promise,
           new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Database timeout')), timeout)
+            setTimeout(() => reject(new Error('Request timeout')), timeout)
           )
         ]);
       };
 
       try {
+        console.log('🔄 Loading data from Supabase...');
         const [servicesData, paymentMethodsData, ordersData, siteSettingsData] = await Promise.all([
-          loadDataWithTimeout(servicesService.getAll()),
-          loadDataWithTimeout(paymentMethodsService.getAll()),
-          loadDataWithTimeout(ordersService.getAll()),
-          loadDataWithTimeout(siteSettingsService.get()).catch(() => defaultSiteSettings)
+          loadDataWithTimeout(servicesService.getAll()).catch(err => {
+            console.warn('Services loading failed:', handleSupabaseError(err));
+            return [];
+          }),
+          loadDataWithTimeout(paymentMethodsService.getAll()).catch(err => {
+            console.warn('Payment methods loading failed:', handleSupabaseError(err));
+            return [];
+          }),
+          loadDataWithTimeout(ordersService.getAll()).catch(err => {
+            console.warn('Orders loading failed:', handleSupabaseError(err));
+            return [];
+          }),
+          loadDataWithTimeout(siteSettingsService.get()).catch(err => {
+            console.warn('Site settings loading failed:', handleSupabaseError(err));
+            return defaultSiteSettings;
+          })
         ]);
 
-        setServices(servicesData);
-        setPaymentMethods(paymentMethodsData);
-        setOrders(ordersData);
-        setSiteSettings(siteSettingsData);
+        // حفظ البيانات المحملة بنجاح
+        if (servicesData.length > 0) {
+          setServices(servicesData);
+          saveToStorage('kyctrust_services', servicesData);
+        }
+        if (paymentMethodsData.length > 0) {
+          setPaymentMethods(paymentMethodsData);
+          saveToStorage('kyctrust_payment_methods', paymentMethodsData);
+        }
+        if (ordersData.length > 0) {
+          setOrders(ordersData);
+          saveToStorage('kyctrust_orders', ordersData);
+        }
+        if (siteSettingsData) {
+          setSiteSettings(siteSettingsData);
+          saveToStorage('kyctrust_site_settings', siteSettingsData);
+        }
+
+        console.log('✅ Data loaded successfully from Supabase');
         setError(null);
+
       } catch (dbError) {
-        console.warn('Database not available, using fallback data:', dbError);
+        console.warn('⚠️ Database error, falling back to cached data:', handleSupabaseError(dbError));
         throw dbError;
       }
     } catch (err) {
-      console.error('Using fallback data due to error:', err);
+      console.log('📦 Using fallback/cached data due to:', handleSupabaseError(err));
 
-      // استخدم البيانات الاحتياطية من localStorage أو البيانات الافتراضية
+      // استخدم البيانات المحفوظة محلياً أو البيانات الافتراضية
       const savedServices = localStorage.getItem('kyctrust_services');
       const savedPaymentMethods = localStorage.getItem('kyctrust_payment_methods');
       const savedSiteSettings = localStorage.getItem('kyctrust_site_settings');
@@ -149,17 +187,28 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setSiteSettings(savedSiteSettings ? JSON.parse(savedSiteSettings) : defaultSiteSettings);
 
       if (savedOrders) {
-        const parsedOrders = JSON.parse(savedOrders);
-        setOrders(parsedOrders.map((order: any) => ({
-          ...order,
-          timestamp: new Date(order.timestamp)
-        })));
+        try {
+          const parsedOrders = JSON.parse(savedOrders);
+          setOrders(parsedOrders.map((order: any) => ({
+            ...order,
+            timestamp: new Date(order.timestamp)
+          })));
+        } catch (parseError) {
+          console.warn('Error parsing saved orders:', parseError);
+          setOrders([]);
+        }
       } else {
         setOrders([]);
       }
 
-      // اعرض تحذيراً بدلاً من خطأ إذا كانت البيانات الاحتياطية متوفرة
-      setError(null);
+      // لا تعرض خطأ إذا كانت البيانات الاحتياطية متوفرة
+      const hasAnyData = savedServices || savedPaymentMethods || savedSiteSettings;
+      if (hasAnyData) {
+        setError(null);
+        console.log('✅ Using cached data successfully');
+      } else {
+        setError('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
+      }
     } finally {
       setLoading(false);
     }
