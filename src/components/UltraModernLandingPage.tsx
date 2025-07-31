@@ -3,7 +3,7 @@ import { MessageCircle } from 'lucide-react';
 import ModernHeader from './modern/ModernHeader';
 import ModernFooter from './modern/ModernFooter';
 import ModernHero from './modern/ModernHero';
-import ModernServices from './modern/ModernServices';
+import ImprovedServices from './modern/ImprovedServices';
 import ModernCTA from './modern/ModernCTA';
 import { useTheme } from '../context/ThemeContext';
 
