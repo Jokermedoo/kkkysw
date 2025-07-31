@@ -37,7 +37,7 @@ function App() {
           <div className="min-h-screen">
           <Routes>
             {/* الصفحة الرئيسية */}
-            <Route path="/" element={<UltraModernLandingPage />} />
+            <Route path="/" element={<SimpleWhatsAppLanding />} />
             
             {/* صفحة تسجيل دخول الادمن */}
             <Route 
