@@ -151,7 +151,7 @@ const InteractiveFeatures: React.FC = () => {
 
           {/* Visual Representation */}
           <div className="relative">
-            <div className={`transition-all duration-700 transform ${isActive ? 'scale-100 opacity-100' : 'scale-95 opacity-80'}`}>
+            <div className={`transition-all duration-700 transform scale-100 opacity-100`}>
               <Card 
                 variant="glass" 
                 className={`p-8 bg-gradient-to-br ${features[activeFeature].bgColor} border-2 border-white/20 dark:border-gray-700/20`}
