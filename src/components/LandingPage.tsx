@@ -6,6 +6,8 @@ import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import StatsCard from './StatsCard';
 import TrustSection from './TrustSection';
+import FloatingWhatsApp from './FloatingWhatsApp';
+import MarketingElements from './MarketingElements';
 
 const LandingPage: React.FC = () => {
   const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
@@ -55,6 +57,9 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+      {/* Marketing Elements */}
+      <MarketingElements />
+
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm shadow-sm border-b border-blue-100 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -283,7 +288,7 @@ const LandingPage: React.FC = () => {
                 <div className="bg-gradient-to-r from-purple-500 to-violet-500 p-4 rounded-xl inline-block mb-6 group-hover:scale-110 transition-transform">
                   <Users className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">دعم متميز</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">دعم متم��ز</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">فريق دعم محترف متاح على مدار الساعة لمساعدتك في أي وقت</p>
               </div>
             </div>
@@ -474,6 +479,9 @@ const LandingPage: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Floating WhatsApp Button */}
+      <FloatingWhatsApp />
 
       {/* Order Modal */}
       <OrderModal
