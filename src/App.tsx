@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { DataProvider } from './context/DataContext';
-import LandingPage from './components/LandingPage';
+import { ThemeProvider } from './context/ThemeContext';
+import NewLandingPage from './components/NewLandingPage';
 import EnhancedAdminPanel from './components/admin/EnhancedAdminPanel';
 import LoginForm from './components/admin/LoginForm';
 
