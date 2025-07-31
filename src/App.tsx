@@ -31,12 +31,13 @@ function App() {
   };
 
   return (
-    <DataProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
+    <ThemeProvider>
+      <DataProvider>
+        <Router>
+          <div className="min-h-screen">
           <Routes>
             {/* الصفحة الرئيسية */}
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={<NewLandingPage />} />
             
             {/* صفحة تسجيل دخول الادمن */}
             <Route 
@@ -65,33 +66,34 @@ function App() {
             {/* إعادة توجيه أي مسار غير معروف للصفحة الرئيسية */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </div>
-      </Router>
-      
-      {/* نظام التنبيهات */}
-      <Toaster 
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
+          </div>
+        </Router>
+
+        {/* نظام التنبيهات */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
             duration: 3000,
             style: {
-              background: '#10B981',
+              background: '#363636',
+              color: '#fff',
             },
-          },
-          error: {
-            duration: 4000,
-            style: {
-              background: '#EF4444',
+            success: {
+              duration: 3000,
+              style: {
+                background: '#10B981',
+              },
             },
-          },
-        }}
-      />
-    </DataProvider>
+            error: {
+              duration: 4000,
+              style: {
+                background: '#EF4444',
+              },
+            },
+          }}
+        />
+      </DataProvider>
+    </ThemeProvider>
   );
 }
 
