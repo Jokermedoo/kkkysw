@@ -5,6 +5,7 @@ import {
   FileText, Settings, RefreshCw, Download
 } from 'lucide-react';
 import { useSupabaseConnection } from '../hooks/useSupabase';
+import { useDatabaseStatus } from '../hooks/useDatabaseStatus';
 import { PerformanceMonitor, getMemoryUsage, getConnectionSpeed } from '../utils/performance';
 
 interface SystemHealth {
