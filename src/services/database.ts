@@ -22,6 +22,65 @@ export const servicesService = {
     } catch (error) {
       throw new Error(handleSupabaseError(error));
     }
+  },
+
+  async create(service: Omit<Service, 'id'>): Promise<Service> {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .insert({
+          name: service.name,
+          price: service.price,
+          order_index: service.order,
+          active: service.active
+        })
+        .select()
+        .single();
+
+      if (error) throw new Error(handleSupabaseError(error));
+
+      return {
+        id: data.id,
+        name: data.name,
+        price: data.price,
+        order: data.order_index,
+        active: data.active
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
+  },
+
+  async update(id: string, service: Partial<Service>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (service.name !== undefined) updateData.name = service.name;
+      if (service.price !== undefined) updateData.price = service.price;
+      if (service.order !== undefined) updateData.order_index = service.order;
+      if (service.active !== undefined) updateData.active = service.active;
+
+      const { error } = await supabase
+        .from('services')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
+  },
+
+  async delete(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
 
