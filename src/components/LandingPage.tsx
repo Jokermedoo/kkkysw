@@ -1,20 +1,33 @@
-import React, { useState } from 'react';
-import { Shield, CheckCircle, CreditCard, MessageCircle, Star, ArrowLeft, Clock, Users, Award, Zap } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Shield, CheckCircle, CreditCard, MessageCircle, Star, ArrowLeft, Clock, Users, Award, Zap, ArrowRight } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import OrderModal from './OrderModal';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
+import SearchAndFilter from './SearchAndFilter';
+import StatsCard from './StatsCard';
 
 const LandingPage: React.FC = () => {
-  const { services, paymentMethods, siteSettings, loading, error, refreshData } = useData();
+  const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [filteredServices, setFilteredServices] = useState(services);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const activeServices = services
     .filter(service => service.active)
     .sort((a, b) => a.order - b.order);
 
   const activePaymentMethods = paymentMethods.filter(method => method.active);
+
+  const stats = useMemo(() => ({
+    totalServices: services.length,
+    activeServices: activeServices.length,
+    totalOrders: orders.length,
+    completedOrders: orders.filter(order => !order.archived).length,
+    averageResponseTime: '15 دقيقة',
+    customerSatisfaction: 98
+  }), [services, activeServices, orders]);
 
   const handleOrderClick = (serviceName: string) => {
     setSelectedService(serviceName);
@@ -122,53 +135,99 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <StatsCard stats={stats} />
+        </div>
+      </section>
+
       {/* Services Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               خدماتنا المالية الرقمية
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg text-gray-600 mb-8">
               نقدم مجموعة شاملة من الخدمات المالية الرقمية بأسعار تنافسية
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeServices.map((service) => (
+
+          <SearchAndFilter
+            services={activeServices}
+            onFilteredServices={setFilteredServices}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+          />
+
+          <div className={`grid gap-6 ${
+            viewMode === 'grid'
+              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid-cols-1'
+          }`}>
+            {filteredServices.map((service) => (
               <div
                 key={service.id}
-                className="bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:scale-105 hover:-translate-y-1"
+                className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:scale-105 hover:-translate-y-1 ${
+                  viewMode === 'list' ? 'flex items-center' : ''
+                }`}
               >
                 <div className="absolute top-4 right-4 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                      {service.name}
-                    </h3>
-                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {service.price}
+                <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+                  <div className={`${viewMode === 'list' ? 'flex items-center justify-between' : 'mb-4'}`}>
+                    <div className={`${viewMode === 'list' ? 'flex items-center space-x-reverse space-x-4' : ''}`}>
+                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                        {service.name}
+                      </h3>
+                      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium inline-block">
+                        {service.price}
+                      </div>
                     </div>
+
+                    {viewMode === 'list' && (
+                      <button
+                        onClick={() => handleOrderClick(service.name)}
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center space-x-reverse space-x-2"
+                      >
+                        <span>اطلب الآن</span>
+                        <ArrowLeft className="h-4 w-4" />
+                      </button>
+                    )}
                   </div>
-                  
-                  <div className="flex items-center space-x-reverse space-x-2 mb-4">
-                    <div className="flex items-center space-x-reverse space-x-1">
-                      <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                      <span className="text-sm text-green-600 font-medium">متوفر الآن</span>
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={() => handleOrderClick(service.name)}
-                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2 group"
-                  >
-                    <span>اطلب الآن</span>
-                    <ArrowLeft className="h-4 w-4 group-hover:transform group-hover:-translate-x-1 transition-transform" />
-                  </button>
+
+                  {viewMode === 'grid' && (
+                    <>
+                      <div className="flex items-center space-x-reverse space-x-2 mb-4">
+                        <div className="flex items-center space-x-reverse space-x-1">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-sm text-green-600 font-medium">متوفر الآن</span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleOrderClick(service.name)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2 group"
+                      >
+                        <span>اطلب الآن</span>
+                        <ArrowLeft className="h-4 w-4 group-hover:transform group-hover:-translate-x-1 transition-transform" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
           </div>
+
+          {filteredServices.length === 0 && (
+            <div className="text-center py-12">
+              <div className="bg-white rounded-2xl shadow-lg p-8 inline-block">
+                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد خدمات متطابقة</h3>
+                <p className="text-gray-600">جرب تغيير معايير البحث أو الفلترة</p>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -229,7 +288,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Payment Methods Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-100">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
