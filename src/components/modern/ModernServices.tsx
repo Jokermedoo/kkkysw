@@ -19,7 +19,7 @@ const ModernServices: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(6);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // تصنيف الخدمات المحسن
@@ -168,7 +168,7 @@ const ModernServices: React.FC = () => {
             onClick={() => setIsModalOpen(true)}
             className="group mb-8"
           >
-            عرض جميع الخدمات ({services.filter(s => s.active).length})
+            عر�� جميع الخدمات ({services.filter(s => s.active).length})
             <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
           </Button>
         </div>
@@ -188,7 +188,7 @@ const ModernServices: React.FC = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="ابح�� عن خدمة مالية..."
+                placeholder="ابحث عن خدمة مالية..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
@@ -241,7 +241,7 @@ const ModernServices: React.FC = () => {
 
         {/* عرض الخدمات */}
         {viewMode === 'grid' ? (
-          /* عرض الشبكة ال��تطور */
+          /* عرض الشبكة المتطور */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
             {filteredServices.map((service, index) => {
               const ServiceIcon = getServiceIcon(service.name);
