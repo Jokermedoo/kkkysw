@@ -156,7 +156,7 @@ const DatabaseManagement: React.FC = () => {
             id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             title VARCHAR(500) NOT NULL DEFAULT 'KYCtrust - خدمات مالية رقمية موثوقة',
             description TEXT NOT NULL DEFAULT 'نقدم خدمات مالية رقمية احترافية وآمنة',
-            order_notice TEXT DEFAULT 'سيتم التواصل معك يدوياً عبر و��تساب بعد إرسال الطلب',
+            order_notice TEXT DEFAULT 'سيتم التواصل معك يدوياً عبر واتساب بعد إرسال الطلب',
             whatsapp_number VARCHAR(50) DEFAULT '201062453344',
             email_address VARCHAR(255) DEFAULT 'support@kyctrust.com',
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -176,7 +176,7 @@ const DatabaseManagement: React.FC = () => {
       const { error } = await supabase.rpc('exec_sql', { sql });
       
       if (error) {
-        throw error;
+        throw new Error(handleSupabaseError(error));
       }
 
       addLog(`✅ Table ${tableName} created successfully`);
