@@ -1,239 +1,282 @@
 import React, { useState } from 'react';
-import { Archive, Trash2, Search, Calendar, User, Package, FileText } from 'lucide-react';
-import { useData, Order } from '../../context/DataContext';
-import LoadingSpinner from '../LoadingSpinner';
-import ErrorMessage from '../ErrorMessage';
+import { 
+  Search, Filter, Download, Eye, MessageCircle, 
+  Calendar, Clock, CheckCircle, AlertCircle, User
+} from 'lucide-react';
+import { useData } from '../../context/DataContext';
 
 const OrdersManager: React.FC = () => {
-  const { orders, archiveOrder, deleteOrder, loading, error, refreshData } = useData();
-  const [filter, setFilter] = useState<'all' | 'active' | 'archived'>('all');
+  const { orders } = useData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
+  // تصفية الطلبات
   const filteredOrders = orders.filter(order => {
-    const matchesFilter = 
-      filter === 'all' || 
-      (filter === 'active' && !order.archived) || 
-      (filter === 'archived' && order.archived);
-
-    const matchesSearch = 
-      searchTerm === '' ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
-
-    return matchesFilter && matchesSearch;
-  }).sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-  const handleArchive = (order: Order) => {
-    if (window.confirm(`هل تريد أرشفة طلب "${order.customerName}"؟`)) {
-      archiveOrder(order.id);
+    const matchesSearch = order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         order.serviceName.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === 'all' || 
+                         (statusFilter === 'completed' && !order.archived) ||
+                         (statusFilter === 'archived' && order.archived);
+    
+    let matchesDate = true;
+    if (dateFilter !== 'all') {
+      const orderDate = new Date(order.timestamp);
+      const now = new Date();
+      
+      switch (dateFilter) {
+        case 'today':
+          matchesDate = orderDate.toDateString() === now.toDateString();
+          break;
+        case 'week':
+          const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+          matchesDate = orderDate >= weekAgo;
+          break;
+        case 'month':
+          const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+          matchesDate = orderDate >= monthAgo;
+          break;
+      }
     }
+    
+    return matchesSearch && matchesStatus && matchesDate;
+  });
+
+  const getStatusBadge = (order: any) => {
+    if (order.archived) {
+      return (
+        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+          <AlertCircle className="w-3 h-3 mr-1" />
+          مؤرشف
+        </span>
+      );
+    }
+    return (
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <CheckCircle className="w-3 h-3 mr-1" />
+        مكتمل
+      </span>
+    );
   };
 
-  const handleDelete = (order: Order) => {
-    if (window.confirm(`هل أنت متأكد من حذف طلب "${order.customerName}"؟ هذا الإجراء لا يمكن التراجع عنه.`)) {
-      deleteOrder(order.id);
-    }
+  const exportOrders = () => {
+    const csvContent = [
+      ['اسم العميل', 'الخدمة', 'التاريخ', 'الملاحظات', 'الحالة'],
+      ...filteredOrders.map(order => [
+        order.customerName,
+        order.serviceName,
+        new Date(order.timestamp).toLocaleDateString('ar-EG'),
+        order.notes,
+        order.archived ? 'مؤرشف' : 'مكتمل'
+      ])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `orders_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
   };
-
-  const activeOrdersCount = orders.filter(order => !order.archived).length;
-  const archivedOrdersCount = orders.filter(order => order.archived).length;
-
-  if (loading) {
-    return <LoadingSpinner size="lg" text="جاري تحميل الطلبات..." />;
-  }
-
-  if (error) {
-    return <ErrorMessage message={error} onRetry={refreshData} />;
-  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">إدارة الطلبات</h1>
-        <p className="text-gray-600 mt-1">عرض وإدارة جميع طلبات العملاء</p>
+      
+      {/* إحصائيات سريعة */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+              <User className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="mr-3">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">إجمالي الطلبات</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{orders.length}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
+              <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="mr-3">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">مكتملة</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {orders.filter(o => !o.archived).length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div className="mr-3">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">اليوم</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {orders.filter(o => {
+                  const today = new Date().toDateString();
+                  return new Date(o.timestamp).toDateString() === today;
+                }).length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center">
+            <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <AlertCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="mr-3">
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">مؤرشفة</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                {orders.filter(o => o.archived).length}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">إجمالي الطلبات</p>
-              <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
-            </div>
-            <div className="p-3 bg-blue-50 rounded-xl">
-              <Package className="h-6 w-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">الطلبات النشطة</p>
-              <p className="text-2xl font-bold text-orange-600">{activeOrdersCount}</p>
-            </div>
-            <div className="p-3 bg-orange-50 rounded-xl">
-              <Calendar className="h-6 w-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">الطلبات المؤرشفة</p>
-              <p className="text-2xl font-bold text-green-600">{archivedOrdersCount}</p>
-            </div>
-            <div className="p-3 bg-green-50 rounded-xl">
-              <Archive className="h-6 w-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      {/* شريط البحث والفلاتر */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+          
+          {/* البحث */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="البحث في الطلبات..."
+              placeholder="ابحث في الطلبات..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
             />
           </div>
 
-          {/* Filter */}
-          <div className="flex bg-gray-100 rounded-lg p-1">
-            {[
-              { key: 'all', label: 'الكل', count: orders.length },
-              { key: 'active', label: 'النشطة', count: activeOrdersCount },
-              { key: 'archived', label: 'المؤرشفة', count: archivedOrdersCount }
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setFilter(tab.key as any)}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  filter === tab.key
-                    ? 'bg-white text-blue-600 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                {tab.label} ({tab.count})
-              </button>
-            ))}
+          {/* الفلاتر */}
+          <div className="flex items-center space-x-4 space-x-reverse">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="all">جميع الحالات</option>
+              <option value="completed">مكتملة</option>
+              <option value="archived">مؤرشفة</option>
+            </select>
+
+            <select
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              className="px-4 py-2.5 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
+            >
+              <option value="all">جميع التواريخ</option>
+              <option value="today">اليوم</option>
+              <option value="week">هذا الأسبوع</option>
+              <option value="month">هذا الشهر</option>
+            </select>
+
+            <button
+              onClick={exportOrders}
+              className="flex items-center space-x-2 space-x-reverse px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+            >
+              <Download className="w-4 h-4" />
+              <span>تصدير</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Orders List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-6">
-          {filteredOrders.length === 0 ? (
-            <div className="text-center py-12">
-              <Package className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">لا توجد طلبات</p>
-              <p className="text-gray-400 text-sm">
-                {searchTerm ? 'لم يتم العثور على طلبات تطابق البحث' : 'لم يتم استلام أي طلبات بعد'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
+      {/* جدول الطلبات */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  العميل
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  الخدمة
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  التاريخ
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  الملاحظات
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  الحالة
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  إجراءات
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {filteredOrders.map((order) => (
-                <div
-                  key={order.id}
-                  className={`p-6 rounded-xl border-2 transition-all ${
-                    order.archived
-                      ? 'border-gray-200 bg-gray-50'
-                      : 'border-blue-200 bg-blue-50'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-reverse space-x-3 mb-3">
-                        <div className={`p-2 rounded-lg ${order.archived ? 'bg-gray-100' : 'bg-blue-100'}`}>
-                          <User className={`h-5 w-5 ${order.archived ? 'text-gray-600' : 'text-blue-600'}`} />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            {order.customerName}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {new Date(order.timestamp).toLocaleDateString('ar-EG', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit'
-                            })}
-                          </p>
-                        </div>
+                <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                        <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-reverse space-x-2">
-                          <Package className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-700">
-                            <strong>الخدمة:</strong> {order.serviceName}
-                          </span>
+                      <div className="mr-3">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {order.customerName}
                         </div>
-                        
-                        {order.notes && (
-                          <div className="flex items-start space-x-reverse space-x-2">
-                            <FileText className="h-4 w-4 text-gray-500 mt-0.5" />
-                            <div className="flex-1">
-                              <p className="text-sm text-gray-700">
-                                <strong>ملاحظات:</strong>
-                              </p>
-                              <p className="text-sm text-gray-600 mt-1 bg-white p-3 rounded-lg">
-                                {order.notes}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-3">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          order.archived
-                            ? 'bg-gray-100 text-gray-800'
-                            : 'bg-orange-100 text-orange-800'
-                        }`}>
-                          {order.archived ? 'مؤرشف' : 'جديد'}
-                        </span>
                       </div>
                     </div>
-
-                    {/* Actions */}
-                    <div className="flex items-center space-x-reverse space-x-2">
-                      {!order.archived && (
-                        <button
-                          onClick={() => handleArchive(order)}
-                          className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                          title="أرشفة الطلب"
-                        >
-                          <Archive className="h-4 w-4" />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(order)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="حذف الطلب"
-                      >
-                        <Trash2 className="h-4 w-4" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    {order.serviceName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {new Date(order.timestamp).toLocaleDateString('ar-EG')}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
+                    {order.notes || 'لا توجد ملاحظات'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {getStatusBadge(order)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex items-center space-x-2 space-x-reverse">
+                      <button className="text-blue-600 hover:text-blue-900 transition-colors duration-200">
+                        <Eye className="w-4 h-4" />
                       </button>
+                      <a
+                        href={`https://wa.me/201062453344?text=مرحباً ${order.customerName}، بخصوص طلب ${order.serviceName}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-green-600 hover:text-green-900 transition-colors duration-200"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                      </a>
                     </div>
-                  </div>
-                </div>
+                  </td>
+                </tr>
               ))}
-            </div>
-          )}
+            </tbody>
+          </table>
         </div>
+
+        {filteredOrders.length === 0 && (
+          <div className="text-center py-12">
+            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              لا توجد طلبات
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              لم يتم العثور على طلبات تطابق المعايير المحددة
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

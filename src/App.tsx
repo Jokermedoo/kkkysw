@@ -1,33 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import LandingPage from './components/LandingPage';
-import AdminPanel from './components/AdminPanel';
 import { DataProvider } from './context/DataContext';
+import { ThemeProvider } from './context/ThemeContext';
+import UltraModernLandingPage from './components/UltraModernLandingPage';
+import ImprovedAdminPanel from './components/admin/ImprovedAdminPanel';
+import LoginForm from './components/admin/LoginForm';
 
 function App() {
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+
+  // فحص حالة المصادقة من localStorage
+  React.useEffect(() => {
+    const savedAuth = localStorage.getItem('adminAuthenticated');
+    if (savedAuth === 'true') {
+      setIsAdminAuthenticated(true);
+    }
+  }, []);
+
+  const handleAdminLogin = (success: boolean) => {
+    setIsAdminAuthenticated(success);
+    if (success) {
+      localStorage.setItem('adminAuthenticated', 'true');
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminAuthenticated(false);
+    localStorage.removeItem('adminAuthenticated');
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <ThemeProvider>
       <DataProvider>
         <Router>
+          <div className="min-h-screen">
           <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/admin" element={<AdminPanel />} />
+            {/* الصفحة الرئيسية */}
+            <Route path="/" element={<UltraModernLandingPage />} />
+            
+            {/* صفحة تسجيل دخول الادمن */}
+            <Route 
+              path="/admin/login" 
+              element={
+                isAdminAuthenticated ? (
+                  <Navigate to="/admin" replace />
+                ) : (
+                  <LoginForm onLogin={handleAdminLogin} />
+                )
+              } 
+            />
+            
+            {/* لوحة تحكم الادمن */}
+            <Route 
+              path="/admin/*" 
+              element={
+                isAdminAuthenticated ? (
+                  <ImprovedAdminPanel onLogout={handleAdminLogout} />
+                ) : (
+                  <Navigate to="/admin/login" replace />
+                )
+              } 
+            />
+            
+            {/* إعادة توجيه أي مسار غير معروف للصفحة الرئيسية */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          </div>
         </Router>
-        <Toaster 
+
+        {/* نظام التنبيهات */}
+        <Toaster
           position="top-center"
           toastOptions={{
-            duration: 4000,
+            duration: 3000,
             style: {
-              direction: 'rtl',
-              fontFamily: 'Arial, sans-serif'
-            }
+              background: '#363636',
+              color: '#fff',
+            },
+            success: {
+              duration: 3000,
+              style: {
+                background: '#10B981',
+              },
+            },
+            error: {
+              duration: 4000,
+              style: {
+                background: '#EF4444',
+              },
+            },
           }}
         />
       </DataProvider>
-    </div>
+    </ThemeProvider>
   );
 }
 

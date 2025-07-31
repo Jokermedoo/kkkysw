@@ -1,292 +1,255 @@
-import { supabase, DatabaseService, DatabasePaymentMethod, DatabaseOrder, DatabaseSiteSettings } from '../lib/supabase';
+import { supabase, DatabaseService, DatabasePaymentMethod, DatabaseOrder, DatabaseSiteSettings, handleSupabaseError } from '../lib/supabase';
 import { Service, PaymentMethod, Order, SiteSettings } from '../context/DataContext';
 
-// خدمات قاعدة البيانات للخدمات
+// خدمات الجدول الرئيسي
 export const servicesService = {
   async getAll(): Promise<Service[]> {
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .order('order_index', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('order_index', { ascending: true });
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return data.map((item: DatabaseService) => ({
-      id: item.id,
-      name: item.name,
-      price: item.price,
-      order: item.order_index,
-      active: item.active
-    }));
+      return data?.map((item: DatabaseService) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        order: item.order_index,
+        active: item.active
+      })) || [];
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async create(service: Omit<Service, 'id'>): Promise<Service> {
-    const { data, error } = await supabase
-      .from('services')
-      .insert({
-        name: service.name,
-        price: service.price,
-        order_index: service.order,
-        active: service.active
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .insert({
+          name: service.name,
+          price: service.price,
+          order_index: service.order,
+          active: service.active
+        })
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return {
-      id: data.id,
-      name: data.name,
-      price: data.price,
-      order: data.order_index,
-      active: data.active
-    };
+      return {
+        id: data.id,
+        name: data.name,
+        price: data.price,
+        order: data.order_index,
+        active: data.active
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
-  async update(id: string, updates: Partial<Service>): Promise<Service> {
-    const updateData: any = {};
-    if (updates.name !== undefined) updateData.name = updates.name;
-    if (updates.price !== undefined) updateData.price = updates.price;
-    if (updates.order !== undefined) updateData.order_index = updates.order;
-    if (updates.active !== undefined) updateData.active = updates.active;
+  async update(id: string, service: Partial<Service>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (service.name !== undefined) updateData.name = service.name;
+      if (service.price !== undefined) updateData.price = service.price;
+      if (service.order !== undefined) updateData.order_index = service.order;
+      if (service.active !== undefined) updateData.active = service.active;
 
-    const { data, error } = await supabase
-      .from('services')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
+      const { error } = await supabase
+        .from('services')
+        .update(updateData)
+        .eq('id', id);
 
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      name: data.name,
-      price: data.price,
-      order: data.order_index,
-      active: data.active
-    };
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('services')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', id);
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
 
-// خدمات قاعدة البيانات لطرق الدفع
 export const paymentMethodsService = {
   async getAll(): Promise<PaymentMethod[]> {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .select('*')
-      .order('created_at', { ascending: true });
+    try {
+      const { data, error } = await supabase
+        .from('payment_methods')
+        .select('*')
+        .order('created_at', { ascending: true });
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return data.map((item: DatabasePaymentMethod) => ({
-      id: item.id,
-      name: item.name,
-      details: item.details,
-      active: item.active
-    }));
+      return data?.map((item: DatabasePaymentMethod) => ({
+        id: item.id,
+        name: item.name,
+        details: item.details,
+        active: item.active
+      })) || [];
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async create(method: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .insert({
-        name: method.name,
-        details: method.details,
-        active: method.active
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('payment_methods')
+        .insert({
+          name: method.name,
+          details: method.details,
+          active: method.active
+        })
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return {
-      id: data.id,
-      name: data.name,
-      details: data.details,
-      active: data.active
-    };
+      return {
+        id: data.id,
+        name: data.name,
+        details: data.details,
+        active: data.active
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
-  async update(id: string, updates: Partial<PaymentMethod>): Promise<PaymentMethod> {
-    const { data, error } = await supabase
-      .from('payment_methods')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+  async update(id: string, method: Partial<PaymentMethod>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (method.name !== undefined) updateData.name = method.name;
+      if (method.details !== undefined) updateData.details = method.details;
+      if (method.active !== undefined) updateData.active = method.active;
 
-    if (error) throw error;
+      const { error } = await supabase
+        .from('payment_methods')
+        .update(updateData)
+        .eq('id', id);
 
-    return {
-      id: data.id,
-      name: data.name,
-      details: data.details,
-      active: data.active
-    };
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('payment_methods')
-      .delete()
-      .eq('id', id);
+    try {
+      const { error } = await supabase
+        .from('payment_methods')
+        .delete()
+        .eq('id', id);
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
 
-// خدمات قاعدة البيانات للطلبات
 export const ordersService = {
   async getAll(): Promise<Order[]> {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return data.map((item: DatabaseOrder) => ({
-      id: item.id,
-      customerName: item.customer_name,
-      serviceName: item.service_name,
-      notes: item.notes,
-      timestamp: new Date(item.created_at),
-      archived: item.archived
-    }));
+      return data?.map((item: DatabaseOrder) => ({
+        id: item.id,
+        customerName: item.customer_name,
+        serviceName: item.service_name,
+        notes: item.notes,
+        timestamp: new Date(item.created_at),
+        archived: item.archived
+      })) || [];
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
   async create(order: Omit<Order, 'id' | 'timestamp'>): Promise<Order> {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        customer_name: order.customerName,
-        service_name: order.serviceName,
-        notes: order.notes,
-        archived: order.archived
-      })
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('orders')
+        .insert({
+          customer_name: order.customerName,
+          service_name: order.serviceName,
+          notes: order.notes,
+          archived: order.archived
+        })
+        .select()
+        .single();
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return {
-      id: data.id,
-      customerName: data.customer_name,
-      serviceName: data.service_name,
-      notes: data.notes,
-      timestamp: new Date(data.created_at),
-      archived: data.archived
-    };
-  },
-
-  async update(id: string, updates: Partial<Order>): Promise<Order> {
-    const updateData: any = {};
-    if (updates.customerName !== undefined) updateData.customer_name = updates.customerName;
-    if (updates.serviceName !== undefined) updateData.service_name = updates.serviceName;
-    if (updates.notes !== undefined) updateData.notes = updates.notes;
-    if (updates.archived !== undefined) updateData.archived = updates.archived;
-
-    const { data, error } = await supabase
-      .from('orders')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-
-    return {
-      id: data.id,
-      customerName: data.customer_name,
-      serviceName: data.service_name,
-      notes: data.notes,
-      timestamp: new Date(data.created_at),
-      archived: data.archived
-    };
-  },
-
-  async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
+      return {
+        id: data.id,
+        customerName: data.customer_name,
+        serviceName: data.service_name,
+        notes: data.notes,
+        timestamp: new Date(data.created_at),
+        archived: data.archived
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
 
-// خدمات قاعدة البيانات لإعدادات الموقع
 export const siteSettingsService = {
   async get(): Promise<SiteSettings> {
-    const { data, error } = await supabase
-      .from('site_settings')
-      .select('*')
-      .limit(1)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .limit(1)
+        .single();
 
-    if (error) throw error;
+      if (error) throw new Error(handleSupabaseError(error));
 
-    return {
-      title: data.title,
-      description: data.description,
-      orderNotice: data.order_notice
-    };
+      return {
+        title: data.title,
+        description: data.description,
+        orderNotice: data.order_notice
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   },
 
-  async update(settings: SiteSettings): Promise<SiteSettings> {
-    // أولاً نحاول الحصول على الإعدادات الحالية
-    const { data: existing } = await supabase
-      .from('site_settings')
-      .select('id')
-      .limit(1)
-      .single();
+  async update(settings: Partial<SiteSettings>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (settings.title !== undefined) updateData.title = settings.title;
+      if (settings.description !== undefined) updateData.description = settings.description;
+      if (settings.orderNotice !== undefined) updateData.order_notice = settings.orderNotice;
 
-    let result;
-    if (existing) {
-      // تحديث الإعدادات الموجودة
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('site_settings')
-        .update({
-          title: settings.title,
-          description: settings.description,
-          order_notice: settings.orderNotice
-        })
-        .eq('id', existing.id)
-        .select()
-        .single();
+        .update(updateData)
+        .eq('id', 1); // نفترض أن هناك صف واحد فقط
 
-      if (error) throw error;
-      result = data;
-    } else {
-      // إنشاء إعدادات جديدة
-      const { data, error } = await supabase
-        .from('site_settings')
-        .insert({
-          title: settings.title,
-          description: settings.description,
-          order_notice: settings.orderNotice
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      result = data;
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
     }
-
-    return {
-      title: result.title,
-      description: result.description,
-      orderNotice: result.order_notice
-    };
   }
 };
