@@ -20,6 +20,7 @@ const ModernServices: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [visibleCount, setVisibleCount] = useState(8);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // تصنيف الخدمات المحسن
   const categories = [
