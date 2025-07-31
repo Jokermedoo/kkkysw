@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Shield, CheckCircle, CreditCard, MessageCircle, Star, ArrowLeft, Clock, Users, Award, Zap, ArrowRight } from 'lucide-react';
+import { Shield, CheckCircle, CreditCard, MessageCircle, Star, ArrowLeft, Clock, Users, Award, Zap } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import OrderModal from './OrderModal';
 import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
-import SearchAndFilter from './SearchAndFilter';
 import StatsCard from './StatsCard';
 import ContactSection from './ContactSection';
 import TrustSection from './TrustSection';
@@ -13,8 +12,7 @@ const LandingPage: React.FC = () => {
   const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filteredServices, setFilteredServices] = useState(services);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
 
   const activeServices = services
     .filter(service => service.active)
@@ -156,80 +154,45 @@ const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <SearchAndFilter
-            services={activeServices}
-            onFilteredServices={setFilteredServices}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-          />
 
-          <div className={`grid gap-6 ${
-            viewMode === 'grid'
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1'
-          }`}>
-            {filteredServices.map((service) => (
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeServices.map((service) => (
               <div
                 key={service.id}
-                className={`bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:scale-105 hover:-translate-y-1 ${
-                  viewMode === 'list' ? 'flex items-center' : ''
-                }`}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden group hover:scale-105 hover:-translate-y-1"
               >
                 <div className="absolute top-4 right-4 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                <div className={`p-6 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                  <div className={`${viewMode === 'list' ? 'flex items-center justify-between' : 'mb-4'}`}>
-                    <div className={`${viewMode === 'list' ? 'flex items-center space-x-reverse space-x-4' : ''}`}>
-                      <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                        {service.name}
-                      </h3>
-                      <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium inline-block">
-                        {service.price}
-                      </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      {service.name}
+                    </h3>
+                    <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                      {service.price}
                     </div>
-
-                    {viewMode === 'list' && (
-                      <button
-                        onClick={() => handleOrderClick(service.name)}
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center space-x-reverse space-x-2"
-                      >
-                        <span>اطلب الآن</span>
-                        <ArrowLeft className="h-4 w-4" />
-                      </button>
-                    )}
                   </div>
 
-                  {viewMode === 'grid' && (
-                    <>
-                      <div className="flex items-center space-x-reverse space-x-2 mb-4">
-                        <div className="flex items-center space-x-reverse space-x-1">
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                          <span className="text-sm text-green-600 font-medium">متوفر الآن</span>
-                        </div>
-                      </div>
+                  <div className="flex items-center space-x-reverse space-x-2 mb-4">
+                    <div className="flex items-center space-x-reverse space-x-1">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-sm text-green-600 font-medium">متوفر الآن</span>
+                    </div>
+                  </div>
 
-                      <button
-                        onClick={() => handleOrderClick(service.name)}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2 group"
-                      >
-                        <span>اطلب الآن</span>
-                        <ArrowLeft className="h-4 w-4 group-hover:transform group-hover:-translate-x-1 transition-transform" />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => handleOrderClick(service.name)}
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2 group"
+                  >
+                    <span>اطلب الآن</span>
+                    <ArrowLeft className="h-4 w-4 group-hover:transform group-hover:-translate-x-1 transition-transform" />
+                  </button>
                 </div>
               </div>
             ))}
           </div>
 
-          {filteredServices.length === 0 && (
-            <div className="text-center py-12">
-              <div className="bg-white rounded-2xl shadow-lg p-8 inline-block">
-                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">لا توجد خدمات متطابقة</h3>
-                <p className="text-gray-600">جرب تغيير معايير البحث أو الفلترة</p>
-              </div>
-            </div>
-          )}
+
         </div>
       </section>
 
@@ -384,7 +347,7 @@ const LandingPage: React.FC = () => {
                 ))}
               </div>
               <p className="text-gray-700 mb-4">
-                "أفضل موقع للخدمات المالية الرقمية. جودة عالية وأمان مضمون."
+                "أفضل م��قع للخدمات المالية الرقمية. جودة عالية وأمان مضمون."
               </p>
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-500 rounded-full flex items-center justify-center text-white font-bold">
