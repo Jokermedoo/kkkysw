@@ -233,5 +233,23 @@ export const siteSettingsService = {
     } catch (error) {
       throw new Error(handleSupabaseError(error));
     }
+  },
+
+  async update(settings: Partial<SiteSettings>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (settings.title !== undefined) updateData.title = settings.title;
+      if (settings.description !== undefined) updateData.description = settings.description;
+      if (settings.orderNotice !== undefined) updateData.order_notice = settings.orderNotice;
+
+      const { error } = await supabase
+        .from('site_settings')
+        .update(updateData)
+        .eq('id', 1); // نفترض أن هناك صف واحد فقط
+
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
