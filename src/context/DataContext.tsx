@@ -22,7 +22,7 @@ export interface SiteSettings {
   title: string;
   description: string;
   orderNotice: string;
-  customization?: string; // JSON string for custom settings
+  customization?: string;
   logoUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
@@ -89,7 +89,7 @@ const defaultPaymentMethods: PaymentMethod[] = [
 const defaultSiteSettings: SiteSettings = {
   title: 'KYCtrust - خدمات مالية رقمية موثوقة',
   description: 'نقدم خدمات مالية رقمية احترافية وآمنة لجميع المنصات العالمية مع ضمان الجودة والموثوقية',
-  orderNotice: 'سيتم التواصل معك يدويًا عبر واتساب بعد إرسال الطلب.',
+  orderNotice: 'سيتم التواصل معك يدوياً عبر واتساب بعد إرسال الطلب.',
   primaryColor: '#3B82F6',
   secondaryColor: '#6366F1',
   whatsappNumber: '201062453344',
@@ -109,16 +109,56 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // فحص الاتصال أولاً
-      const connectionTest = await testSupabaseConnection();
+      // استيراد أدوات الإعداد المتقدمة
+      console.log('🚀 Starting enhanced data refresh...');
+      
+      let setupUtils;
+      try {
+        setupUtils = await import('../utils/supabase-setup');
+      } catch (importError) {
+        console.warn('⚠️ Could not import setup utils, using basic connection test');
+        const connectionTest = await testSupabaseConnection();
+        if (!connectionTest.success) {
+          throw new Error(connectionTest.error || 'Connection failed');
+        }
+        setupUtils = null;
+      }
 
-      if (!connectionTest.success) {
-        console.warn('⚠��� Supabase connection failed, using fallback data');
-        throw new Error(connectionTest.error || 'Connection failed');
+      if (setupUtils) {
+        // فحص الاتصال المتقدم والإعداد التلقائي
+        console.log('🔍 Testing Supabase connection with auto-setup...');
+        const connectionTest = await setupUtils.testSupabaseConnectionAdvanced();
+
+        if (!connectionTest.connection) {
+          console.warn('⚠️ Supabase connection failed, using fallback data');
+          throw new Error('Connection failed');
+        }
+
+        console.log(`📊 Connection latency: ${connectionTest.latency.toFixed(2)}ms`);
+
+        // فحص الجداول وإنشاؤها إذا لزم الأمر
+        const missingTables = connectionTest.tables.filter(t => !t.exists);
+        if (missingTables.length > 0) {
+          console.log(`📋 Missing tables detected: ${missingTables.map(t => t.name).join(', ')}`);
+          console.log('🔧 Auto-setting up missing tables...');
+          
+          toast.loading('جاري إ��داد قاعدة البيانات...', { id: 'setup' });
+          
+          const setupResult = await setupUtils.setupSupabaseComplete();
+          if (setupResult.success) {
+            console.log('✅ Database auto-setup completed successfully');
+            toast.success('تم إعداد قاعدة البيانات بنجاح!', { id: 'setup' });
+          } else {
+            console.warn('⚠️ Database setup had issues:', setupResult.message);
+            toast.dismiss('setup');
+          }
+        } else {
+          console.log('✅ All required tables are present');
+        }
       }
 
       // تحميل البيانات مع timeout محسن
-      const loadDataWithTimeout = (promise: Promise<any>, timeout = 8000) => {
+      const loadDataWithTimeout = (promise: Promise<any>, timeout = 10000) => {
         return Promise.race([
           promise,
           new Promise((_, reject) =>
@@ -128,7 +168,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       };
 
       try {
-        console.log('🔄 Loading data from Supabase...');
+        console.log('📥 Loading data from Supabase...');
         const [servicesData, paymentMethodsData, ordersData, siteSettingsData] = await Promise.all([
           loadDataWithTimeout(servicesService.getAll()).catch(err => {
             console.warn('Services loading failed:', handleSupabaseError(err));
@@ -152,21 +192,35 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         if (servicesData.length > 0) {
           setServices(servicesData);
           saveToStorage('kyctrust_services', servicesData);
+          console.log(`✅ Loaded ${servicesData.length} services`);
+        } else {
+          // استخدم البيانات الافتراضية إذا لم يتم العثور على بيانات
+          setServices(defaultServices);
+          console.log('📦 Using default services data');
         }
+        
         if (paymentMethodsData.length > 0) {
           setPaymentMethods(paymentMethodsData);
           saveToStorage('kyctrust_payment_methods', paymentMethodsData);
+          console.log(`✅ Loaded ${paymentMethodsData.length} payment methods`);
+        } else {
+          setPaymentMethods(defaultPaymentMethods);
+          console.log('📦 Using default payment methods data');
         }
+        
         if (ordersData.length > 0) {
           setOrders(ordersData);
           saveToStorage('kyctrust_orders', ordersData);
+          console.log(`✅ Loaded ${ordersData.length} orders`);
         }
+        
         if (siteSettingsData) {
           setSiteSettings(siteSettingsData);
           saveToStorage('kyctrust_site_settings', siteSettingsData);
+          console.log('✅ Loaded site settings');
         }
 
-        console.log('✅ Data loaded successfully from Supabase');
+        console.log('🎉 Data loading completed successfully');
         setError(null);
 
       } catch (dbError) {
@@ -208,6 +262,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('✅ Using cached data successfully');
       } else {
         setError('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
+        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا��ات المحلية');
       }
     } finally {
       setLoading(false);
@@ -219,7 +274,11 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, []);
 
   const saveToStorage = (key: string, data: any) => {
-    localStorage.setItem(key, JSON.stringify(data));
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (err) {
+      console.warn('Could not save to localStorage:', err);
+    }
   };
 
   const updateService = async (id: string, updates: Partial<Service>) => {
@@ -329,7 +388,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const updatedSettings = await siteSettingsService.update(settings);
       setSiteSettings(updatedSettings);
       saveToStorage('kyctrust_site_settings', updatedSettings);
-      toast.success('تم تحديث إعدادات الموق�� بنجاح');
+      toast.success('تم تحديث إعدادات الموقع بنجاح');
     } catch (err) {
       console.error('Error updating site settings:', err);
       toast.error('حدث خطأ في تحديث إعدادات الموقع');
@@ -368,7 +427,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       );
       setOrders(updatedOrders);
       saveToStorage('kyctrust_orders', updatedOrders);
-      toast.success('تم أ��شفة الطلب بنجاح');
+      toast.success('تم أرشفة الطلب بنجاح');
     } catch (err) {
       console.error('Error archiving order:', err);
       toast.error('حدث خطأ في أرشفة الطلب');
