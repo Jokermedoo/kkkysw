@@ -26,6 +26,7 @@ interface PerformanceMetrics {
 
 const SystemMonitor: React.FC = () => {
   const { isConnected, latency } = useSupabaseConnection();
+  const { status: dbStatus, refresh: refreshDatabase } = useDatabaseStatus();
   const [systemHealth, setSystemHealth] = useState<SystemHealth>({
     database: 'healthy',
     performance: 'good',
