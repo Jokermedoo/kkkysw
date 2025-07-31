@@ -1,213 +1,132 @@
-# KYCtrust - منصة الخدمات المالية الرقمية
+# 🚀 KYCtrust - منصة الخدمات المالية الرقمية
 
-## 🚀 نظرة عامة
-KYCtrust هو موقع احترافي متكامل للخدمات المالية الرقمية مبني باستخدام React و TypeScript مع قاعدة بيانات Supabase. يوفر الموقع صفحة هبوط عصرية ولوحة تحكم إدارية شاملة مع إمكانيات تخصيص كاملة.
+## 📋 الجداول المطلوبة في Supabase
 
-## ✨ الميزات الرئيسية
+### 1. جدول الخدمات (services)
+```sql
+CREATE TABLE public.services (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price VARCHAR(100) NOT NULL,
+    order_index INTEGER NOT NULL DEFAULT 0,
+    active BOOLEAN DEFAULT true,
+    description TEXT,
+    category VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-### 🎯 صفحة الهبوط
-- **تصميم عصري ومتجاوب** مع دعم كامل للغة العربية (RTL)
-- **إحصائيات تفاعلية** ومعلومات ديناميكية
-- **عرض الخدمات** مع تصميم بطاقات احترافي
-- **نماذج طلب متقدمة** مع إشعارات فورية
-- **قسم شهادات العملاء** مع عرض دوار تلقائي
-- **قسم الثقة والأمان** مع الشهادات والضمانات
-- **نموذج اتصال شامل** مع خيارات متعددة للتواصل
+ALTER TABLE public.services ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for services" ON public.services FOR ALL USING (true);
 
-### 🛡️ لوحة التحكم الإدارية
-- **لوحة تحكم رئيسية** مع إحصائيات مفصلة
-- **رسوم بيانية تفاعلية** مع Recharts
-- **إدارة الخدمات** (إضافة/تعديل/حذف/تفعيل)
-- **إدارة الطلبات** مع بحث وفلترة متقدمة
-- **إدارة طرق الدفع** م�� عرض تفصيلي
-- **إدارة التخصيص الكامل** للموقع
-- **إدارة قاعدة البيانات** مع نسخ احتياطية
-- **قسم التحليلات** المتقدم
-- **نظام مصادقة آمن**
+INSERT INTO public.services (name, price, order_index, active, description, category) VALUES
+('Payoneer', '30$', 1, true, 'حساب بايونير مفعل وجاهز للاستخدام', 'digital_wallets'),
+('Wise', '30$', 2, true, 'حساب وايز للتحويلات الدولية', 'digital_wallets'),
+('Skrill', '20$', 3, true, 'محفظة سكريل إلكترونية', 'digital_wallets'),
+('Neteller', '20$', 4, true, 'محفظة نيتلر للمدفوعات', 'digital_wallets'),
+('PayPal', '15$', 5, true, 'حساب باي بال مفعل', 'digital_wallets');
+```
 
-### 🎨 التخصيص الكامل
-- **تخصيص الألوان** والمظهر العام
-- **تعديل النصوص** والمحتوى
-- **إدارة الصور** والشعارات
-- **إعداد وسائل التواصل**
-- **تخصيص القسم الرئيسي**
-- **إدارة الميزات** والخدمات
-- **تصدير/استيراد الإعدادات**
+### 2. جدول طرق الدفع (payment_methods)
+```sql
+CREATE TABLE public.payment_methods (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    details TEXT NOT NULL,
+    active BOOLEAN DEFAULT true,
+    type VARCHAR(50) DEFAULT 'bank',
+    instructions TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-### 🗄️ إدارة قاعدة البيانات
-- **نسخ احتياطية تلقائية**
-- **إحصائيات الأداء**
-- **مراقبة النظام**
-- **استعادة البيانات**
-- **تحسين الأداء**
+ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for payment_methods" ON public.payment_methods FOR ALL USING (true);
 
-## 🛠️ التقنيات المستخدمة
+INSERT INTO public.payment_methods (name, details, active, type, instructions) VALUES
+('Vodafone Cash', '01062453344', true, 'mobile_money', 'قم بالتحويل إلى الرقم المذكور وأرسل صورة الإيصال'),
+('USDT (TRC20)', 'TFUt8GRpk2R8Wv3FvoCiSUghRBQo4HrmQK', true, 'cryptocurrency', 'أرسل USDT على شبكة TRC20 إلى العنوان المذكور');
+```
 
-### Frontend
-- **React 18.3.1** - أحدث إصدار
-- **TypeScript** - للبرمجة الآمنة
-- **Vite** - أداة البناء السريعة
-- **Tailwind CSS 3.4.1** - إطار عمل CSS العصري
-- **Lucide React** - مكتبة الأيقونات
-- **Recharts** - مكتبة الرسوم البيانية
-- **React Router DOM** - التنقل
-- **React Hot Toast** - الإشعارات
+### 3. جدول الطلبات (orders)
+```sql
+CREATE TABLE public.orders (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_email VARCHAR(255),
+    customer_phone VARCHAR(50),
+    service_name VARCHAR(255) NOT NULL,
+    notes TEXT,
+    status VARCHAR(50) DEFAULT 'pending',
+    archived BOOLEAN DEFAULT false,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-### Backend & Database
-- **Supabase** - قاعدة البيانات والمصادقة
-- **PostgreSQL** - قاعدة البيانات الأساسية
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for orders" ON public.orders FOR ALL USING (true);
+```
 
-## 📁 هيكل المشروع
+### 4. جدول إعدادات الموقع (site_settings)
+```sql
+CREATE TABLE public.site_settings (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    title VARCHAR(500) NOT NULL DEFAULT 'KYCtrust - خدمات مالية رقمية موثوقة',
+    description TEXT NOT NULL DEFAULT 'نقدم خدمات مالية رقمية احترافية وآمنة',
+    order_notice TEXT DEFAULT 'سيتم التواصل معك يدوياً عبر واتساب بعد إرسال الطلب',
+    whatsapp_number VARCHAR(50) DEFAULT '201062453344',
+    email_address VARCHAR(255) DEFAULT 'support@kyctrust.com',
+    primary_color VARCHAR(20) DEFAULT '#3B82F6',
+    secondary_color VARCHAR(20) DEFAULT '#6366F1',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Enable all access for site_settings" ON public.site_settings FOR ALL USING (true);
+
+INSERT INTO public.site_settings (title, description, order_notice) VALUES
+('KYCtrust - خدمات مالية رقمية موثوقة', 'نقدم خدمات مالية رقمية احترافية وآمنة لجميع المنصات العالمية مع ضمان الجودة والموثوقية', 'سيتم التواصل معك يدوياً عبر واتساب بعد إرسال الطلب.');
+```
+
+## 🚀 التشغيل
+
+```bash
+npm install
+npm run dev
+```
+
+## 🔧 إعداد متغيرات البيئة
+
+إنشئ ملف `.env.local`:
+```
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_anon_key
+```
+
+## 🎯 الملفات الأساسية
 
 ```
 src/
 ├── components/
-│   ├── LandingPage.tsx          # الصفحة الرئيسية
-│   ├── AdminPanel.tsx           # لوحة التحكم الرئيسية
-│   ├── OrderModal.tsx           # نموذج الطلبات
-│   ├── StatsCard.tsx           # بطاقات الإحصائيات
-│   ├── TrustSection.tsx        # قسم الثقة والشهادات
-│   ├── ContactSection.tsx      # قسم الاتصال
-│   ├── StatusNotification.tsx  # الإشعارات
-│   ├── LoadingSpinner.tsx      # مؤشر التحميل
-│   ├── ErrorMessage.tsx        # رسائل الخطأ
-│   └── admin/
-│       ├── EnhancedAdminPanel.tsx      # لوحة التحكم المحسنة
-│       ├── CustomizationManager.tsx    # إدارة التخصيص
-│       ├── DatabaseManager.tsx         # إدارة قاعدة البيانات
-│       ├── LoginForm.tsx              # نموذج تسجيل الدخول
-│       └── [Other admin components]
+│   ├── ErrorMessage.tsx
+│   ├── FloatingWhatsApp.tsx
+│   ├── LandingPage.tsx
+│   ├── LoadingSpinner.tsx
+│   ├── MarketingElements.tsx
+│   ├── OrderModal.tsx
+│   ├── StatsCard.tsx
+│   └── TrustSection.tsx
 ├── context/
-│   └── DataContext.tsx         # إدارة الحال��
-├── services/
-│   └── database.ts            # خدمات قاعدة البيانات
+│   └── DataContext.tsx
 ├── lib/
-│   └── supabase.ts           # إعداد Supabase
-└── App.tsx                   # المكون الرئيسي
+│   └── supabase.ts
+├── services/
+│   └── database.ts
+└── App.tsx
 ```
 
-## 🚀 التشغيل والإعداد
+## 📞 الدعم
 
-### متطلبات النظام
-- Node.js 16+ 
-- npm أو yarn
-
-### التثبيت
-```bash
-# استنساخ المشروع
-git clone <repository-url>
-cd kyctrust
-
-# تثبيت المكتبات
-npm install
-
-# إعداد متغيرات البيئة
-# إنشاء ملف .env.local
-VITE_SUPABASE_URL=https://gpiffuofwjenizlufkgu.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key-here
-```
-
-### التشغيل للتطوير
-```bash
-npm run dev
-```
-
-### البناء للإنتاج
-```bash
-npm run build
-npm run preview
-```
-
-## 🗄️ قاعدة البيانات
-
-### جداول قاعدة البيانات
-- **services** - جدول الخدمات
-- **payment_methods** - جدول طرق الدفع  
-- **orders** - جدول الطلبات
-- **site_settings** - جدول إعدادات الموقع
-
-### إعداد Supabase
-1. إنشاء مشروع جديد في Supabase
-2. تشغيل SQL scripts لإنشاء الجداول
-3. إعداد متغيرات البيئة
-4. تفعيل Row Level Security (RLS)
-
-## 🔐 الأمان
-
-- **تشفير البيانات** في النقل والتخزين
-- **نظام مصادقة آمن** مع Supabase
-- **حماية من الأخطاء** والاستثناءات
-- **تخزين محلي آمن** للبيانات الاحتياطية
-- **Row Level Security** في قاعدة البيانات
-
-## 🎨 التخصيص
-
-### تخصيص الألوان
-```typescript
-const customColors = {
-  primary: '#3B82F6',
-  secondary: '#6366F1',
-  accent: '#10B981',
-  background: '#F8FAFC'
-};
-```
-
-### تخصيص النصوص
-- عناوين الصفحات
-- أوصاف الخدمات
-- نصوص الأزرار
-- رسائل الإشعارات
-
-### تخصيص الإعدادات
-- معلومات الشركة
-- وسائل التواصل
-- طرق الدفع
-- إعدادات المظهر
-
-## 📊 الإحصائيات والتحليلات
-
-- **إحصائيات المبيعات** الفورية
-- **رسوم بيانية** للطلبات والإيرادات
-- **تحليل شعبية الخدمات**
-- **مراقبة الأداء** المستمرة
-- **تقارير مفصلة** قابلة للتصدير
-
-## 🔧 الصيانة والدعم
-
-### النسخ الاحتياطية
-- نسخ احتياطية تلقائية يومية
-- إمكانية الاستعادة الفورية
-- تصدير البيانات بصيغة JSON
-
-### مراقبة الأداء
-- مراقبة سرعة الاستجابة
-- إحصائيات استخدام الذاكرة
-- معدلات النجاح والفشل
-
-### التحديثات
-- تحديثات أمنية منتظمة
-- إضافة ميزات جديدة
-- تحسينات الأداء المستمرة
-
-## 📝 الترخيص
-
-هذا المشروع مبني لشركة KYCtrust وجميع الحقوق محفوظة.
-
-## 🤝 المساهمة
-
-للمساهمة في تطوير المشروع:
-1. Fork المشروع
-2. إنشاء branch جديد للميزة
-3. Commit التغييرات
-4. Push إلى Branch
-5. إنشاء Pull Request
-
-## 📞 التواصل والدعم
-
-- **الواتساب**: +20 106 245 3344
-- **البريد الإلكتروني**: support@kyctrust.com
-- **الموقع الإلكتروني**: www.kyctrust.com
-
----
-
-**تم تطوير هذا المشروع بعناية فائقة ليكون منصة احترافية متكاملة للخدمات المالية الرقمية مع إمكانيات تخصيص شاملة.**
+- هاتف: +20 106 245 3344
+- البريد: support@kyctrust.com
