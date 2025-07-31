@@ -15,7 +15,7 @@ interface OrderModalProps {
   }>;
 }
 
-const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, serviceName }) => {
+const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, serviceName, paymentMethods = [] }) => {
   const { addOrder } = useData();
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
@@ -48,7 +48,7 @@ const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, serviceName })
       setEmail('');
       setNotes('');
       
-      // إغلاق النافذة بعد 2 ثانية
+      // إغلاق النافذة بعد 2 ثان��ة
       setTimeout(() => {
         onClose();
         setShowSuccess(false);
