@@ -138,7 +138,7 @@ const ModernServices: React.FC = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* عنوان القسم */}
-        <div 
+        <div
           className={`text-center mb-16 transition-all duration-1000 ${
             isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
           }`}
@@ -147,16 +147,30 @@ const ModernServices: React.FC = () => {
             <Zap className="w-5 h-5 text-blue-600 dark:text-blue-400 animate-pulse" />
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400">خدمات مميزة</span>
           </div>
-          
+
           <h2 className="text-4xl md:text-6xl font-black text-gray-900 dark:text-white mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
               خدماتنا المالية
             </span>
           </h2>
-          
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
             احصل على حساباتك المالية الرقمية من منصة واحدة موثوقة مع أفضل الأسعار وأسرع خدمة
           </p>
+
+          {/* زر عرض جميع الخدمات */}
+          <Button
+            variant="gradient"
+            size="lg"
+            icon={Package}
+            iconPosition="right"
+            glow={true}
+            onClick={() => setIsModalOpen(true)}
+            className="group mb-8"
+          >
+            عرض جميع الخدمات ({services.filter(s => s.active).length})
+            <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
+          </Button>
         </div>
 
         {/* شريط التحكم المتطور */}
@@ -174,7 +188,7 @@ const ModernServices: React.FC = () => {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="ابحث عن خدمة مالية..."
+                placeholder="ابح�� عن خدمة مالية..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-4 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 text-lg"
@@ -227,7 +241,7 @@ const ModernServices: React.FC = () => {
 
         {/* عرض الخدمات */}
         {viewMode === 'grid' ? (
-          /* عرض الشبكة المتطور */
+          /* عرض الشبكة ال��تطور */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-12">
             {filteredServices.map((service, index) => {
               const ServiceIcon = getServiceIcon(service.name);
