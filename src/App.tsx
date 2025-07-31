@@ -15,6 +15,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/database" element={<DatabaseManagement />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
