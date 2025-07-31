@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Toaster } from 'react-hot-toast';
 import LandingPage from './components/LandingPage';
 import AdminPanel from './components/AdminPanel';
+import SystemMonitor from './components/SystemMonitor';
 import { DataProvider } from './context/DataContext';
 
 function App() {
@@ -16,7 +17,7 @@ function App() {
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Router>
-        <Toaster 
+        <Toaster
           position="top-center"
           toastOptions={{
             duration: 4000,
@@ -26,6 +27,7 @@ function App() {
             }
           }}
         />
+        <SystemMonitor />
       </DataProvider>
     </div>
   );
