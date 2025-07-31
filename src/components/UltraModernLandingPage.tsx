@@ -27,8 +27,8 @@ const UltraModernLandingPage: React.FC = () => {
         {/* Hero Section متطور */}
         <ModernHero />
         
-        {/* Services Section محسن */}
-        <ImprovedServices />
+        {/* Services Section نظيف ومتقدم */}
+        <CleanServices />
         
         {/* CTA Section متطور */}
         <ModernCTA />
