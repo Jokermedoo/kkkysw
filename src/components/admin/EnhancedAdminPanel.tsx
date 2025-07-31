@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useData } from '../../context/DataContext';
 import CustomizationManager from './CustomizationManager';
+import DatabaseManager from './DatabaseManager';
 
 const EnhancedAdminPanel: React.FC = () => {
   const { 
@@ -71,7 +72,8 @@ const EnhancedAdminPanel: React.FC = () => {
     { id: 'payments', name: 'طرق الدفع', icon: DollarSign },
     { id: 'settings', name: 'إعدادات الموقع', icon: Settings },
     { id: 'analytics', name: 'التحليلات', icon: TrendingUp },
-    { id: 'customization', name: 'إدارة التخصيص', icon: Settings }
+    { id: 'customization', name: 'إدارة التخصيص', icon: Settings },
+    { id: 'database', name: 'إدارة قاعدة البيانات', icon: Shield }
   ];
 
   const StatCard = ({ title, value, icon: Icon, color, change }: any) => (
@@ -124,7 +126,7 @@ const EnhancedAdminPanel: React.FC = () => {
         />
       </div>
 
-      {/* الرسوم البيانية */}
+      {/* ال��سوم البيانية */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">الطلبات خلال الأسبوع</h3>
@@ -580,6 +582,7 @@ const EnhancedAdminPanel: React.FC = () => {
           {activeTab === 'settings' && renderSettings()}
           {activeTab === 'analytics' && renderAnalytics()}
           {activeTab === 'customization' && <CustomizationManager />}
+          {activeTab === 'database' && <DatabaseManager />}
         </main>
       </div>
     </div>
