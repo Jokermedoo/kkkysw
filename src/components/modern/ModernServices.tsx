@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, Filter, Grid3X3, List, ChevronRight, 
+import {
+  Search, Filter, Grid3X3, List, ChevronRight,
   Zap, Clock, Shield, Star, MessageCircle, TrendingUp,
-  CreditCard, Bitcoin, Smartphone, DollarSign
+  CreditCard, Bitcoin, Smartphone, DollarSign, Package,
+  Eye, ArrowUpRight
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useData } from '../../context/DataContext';
 import { useInView } from '../../hooks/useInView';
 import Card from '../ui/Card';
 import Button from '../ui/Button';
+import ServicesModal from './ServicesModal';
 
 const ModernServices: React.FC = () => {
   const { t, language } = useTheme();
