@@ -39,6 +39,9 @@ const UltraModernLandingPage: React.FC = () => {
         {/* Testimonials Section */}
         <TestimonialsSection />
 
+        {/* FAQ Section */}
+        <FAQSection />
+
         {/* CTA Section متطور */}
         <ModernCTA />
       </main>
