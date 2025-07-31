@@ -73,42 +73,92 @@ export async function testSupabaseConnection(): Promise<{
   }
 }
 
-// معالج أخطاء محسن
+// معالج أخطاء محسن ومحدث
 export function handleSupabaseError(error: any): string {
-  if (!error) return '';
+  // التعامل مع القيم الفارغة
+  if (!error) return 'خطأ غير محدد';
 
-  // تحويل الكائن إلى نص مفهوم
+  // التعامل مع النصوص المباشرة
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  // التعامل مع الأرقام
+  if (typeof error === 'number') {
+    return `خطأ رقم: ${error}`;
+  }
+
+  // التعامل مع الكائنات
   if (typeof error === 'object') {
-    if (error.message) {
+    // إذا كان Error object
+    if (error instanceof Error) {
+      return error.message || 'خطأ في النظام';
+    }
+
+    // إذا كان له خاصية message
+    if (error.message && typeof error.message === 'string') {
       return error.message;
     }
+
+    // إذا كان له خاصية details
+    if (error.details && typeof error.details === 'string') {
+      return error.details;
+    }
+
+    // التعامل مع أكواد Supabase المحددة
     if (error.code) {
-      switch (error.code) {
-        case 'PGRST116':
-          return 'لا توجد بيانات';
-        case 'PGRST301':
-          return 'غير مصرح بالوصول';
-        case '23505':
-          return 'البيانات موجودة بالفعل';
-        case '23503':
-          return 'لا يمكن حذف هذا العنصر';
-        case 'NETWORK_ERROR':
-          return 'خطأ في الشبكة';
-        case 'TIMEOUT_ERROR':
-          return 'انتهت مهلة الاتصال';
-        default:
-          return `خطأ قاعدة البيانات: ${error.code}`;
+      const errorCodes: { [key: string]: string } = {
+        'PGRST116': 'لا توجد بيانات متاحة',
+        'PGRST301': 'غير مصرح بالوصول إلى هذا المورد',
+        'PGRST204': 'لا توجد نتائج',
+        '23505': 'هذه البيانات موجودة بالفعل',
+        '23503': 'لا يمكن حذف هذا العنصر لوجود ارتباطات',
+        '23502': 'قيمة مطلوبة مفقودة',
+        '42P01': 'الجدول غير موجود',
+        '42703': 'العمود غير موجود',
+        'NETWORK_ERROR': 'خطأ في اتصال الشبكة',
+        'TIMEOUT_ERROR': 'انتهت مهلة الانتظار',
+        'AUTH_ERROR': 'خطأ في المصادقة'
+      };
+
+      return errorCodes[error.code] || `خطأ في قاعدة البيانات (${error.code})`;
+    }
+
+    // إذا كان له خاصية hint
+    if (error.hint) {
+      return `تلميح: ${error.hint}`;
+    }
+
+    // محاولة استخراج أي نص مفيد من الكائن
+    const errorKeys = ['error', 'statusText', 'description', 'title'];
+    for (const key of errorKeys) {
+      if (error[key] && typeof error[key] === 'string') {
+        return error[key];
       }
     }
-    // تحويل الكائن إلى JSON مقروء
+
+    // كحل أخير، تحويل الكائن إلى نص JSON مقروء
     try {
-      return JSON.stringify(error);
+      const errorString = JSON.stringify(error, null, 2);
+      // إذا كان الكائن فارغ
+      if (errorString === '{}' || errorString === 'null') {
+        return 'خطأ غير معروف في قاعدة البيانات';
+      }
+      // قطع النص إذا كان طويلاً جداً
+      return errorString.length > 200
+        ? `خطأ في قاعدة ال��يانات: ${errorString.substring(0, 200)}...`
+        : `خطأ في قاعدة البيانات: ${errorString}`;
     } catch {
-      return 'خطأ غير معروف في قاعدة البيانات';
+      return 'خطأ غير قابل للقراءة في قاعدة البيانات';
     }
   }
 
-  return String(error) || 'خطأ غير معروف';
+  // التعامل مع أي نوع آخر
+  try {
+    return String(error) || 'خطأ غير معروف';
+  } catch {
+    return 'خطأ غير قابل للتحويل';
+  }
 }
 
 // Types for database tables
