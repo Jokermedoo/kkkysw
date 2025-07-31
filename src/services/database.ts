@@ -103,6 +103,62 @@ export const paymentMethodsService = {
     } catch (error) {
       throw new Error(handleSupabaseError(error));
     }
+  },
+
+  async create(method: Omit<PaymentMethod, 'id'>): Promise<PaymentMethod> {
+    try {
+      const { data, error } = await supabase
+        .from('payment_methods')
+        .insert({
+          name: method.name,
+          details: method.details,
+          active: method.active
+        })
+        .select()
+        .single();
+
+      if (error) throw new Error(handleSupabaseError(error));
+
+      return {
+        id: data.id,
+        name: data.name,
+        details: data.details,
+        active: data.active
+      };
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
+  },
+
+  async update(id: string, method: Partial<PaymentMethod>): Promise<void> {
+    try {
+      const updateData: any = {};
+      if (method.name !== undefined) updateData.name = method.name;
+      if (method.details !== undefined) updateData.details = method.details;
+      if (method.active !== undefined) updateData.active = method.active;
+
+      const { error } = await supabase
+        .from('payment_methods')
+        .update(updateData)
+        .eq('id', id);
+
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
+  },
+
+  async delete(id: string): Promise<void> {
+    try {
+      const { error } = await supabase
+        .from('payment_methods')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw new Error(handleSupabaseError(error));
+    } catch (error) {
+      throw new Error(handleSupabaseError(error));
+    }
   }
 };
 
