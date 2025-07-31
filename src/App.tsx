@@ -37,7 +37,7 @@ function App() {
           <div className="min-h-screen">
           <Routes>
             {/* الصفحة الرئيسية */}
-            <Route path="/" element={<ImprovedLandingPage />} />
+            <Route path="/" element={<UltraModernLandingPage />} />
             
             {/* صفحة تسجيل دخول الادمن */}
             <Route 
