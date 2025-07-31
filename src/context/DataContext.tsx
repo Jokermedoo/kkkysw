@@ -88,7 +88,11 @@ const defaultPaymentMethods: PaymentMethod[] = [
 const defaultSiteSettings: SiteSettings = {
   title: 'KYCtrust - خدمات مالية رقمية موثوقة',
   description: 'نقدم خدمات مالية رقمية احترافية وآمنة لجميع المنصات العالمية مع ضمان الجودة والموثوقية',
-  orderNotice: 'سيتم التواصل معك يدويًا عبر واتساب بعد إرسال الطلب.'
+  orderNotice: 'سيتم التواصل معك يدويًا عبر واتساب بعد إرسال الطلب.',
+  primaryColor: '#3B82F6',
+  secondaryColor: '#6366F1',
+  whatsappNumber: '201062453344',
+  emailAddress: 'support@kyctrust.com'
 };
 
 export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -276,7 +280,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const updatedSettings = await siteSettingsService.update(settings);
       setSiteSettings(updatedSettings);
       saveToStorage('kyctrust_site_settings', updatedSettings);
-      toast.success('تم تحديث إعدادات الموقع بنجاح');
+      toast.success('تم تحديث إعدادات الموق�� بنجاح');
     } catch (err) {
       console.error('Error updating site settings:', err);
       toast.error('حدث خطأ في تحديث إعدادات الموقع');
@@ -315,7 +319,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       );
       setOrders(updatedOrders);
       saveToStorage('kyctrust_orders', updatedOrders);
-      toast.success('تم أرشفة الطلب بنجاح');
+      toast.success('تم أ��شفة الطلب بنجاح');
     } catch (err) {
       console.error('Error archiving order:', err);
       toast.error('حدث خطأ في أرشفة الطلب');
