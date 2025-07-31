@@ -25,6 +25,11 @@ export default {
         'flip': 'flip 1s ease-in-out infinite',
         'rotate-y': 'rotateY 2s ease-in-out infinite',
         'scale-pulse': 'scalePulse 2s ease-in-out infinite',
+        'float-x': 'floatX 4s ease-in-out infinite',
+        'float-y': 'floatY 6s ease-in-out infinite',
+        'particle': 'particle 8s linear infinite',
+        'glow-pulse': 'glowPulse 3s ease-in-out infinite',
+        'text-glow': 'textGlow 2s ease-in-out infinite alternate',
       },
       keyframes: {
         fadeIn: {
