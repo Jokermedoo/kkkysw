@@ -58,7 +58,19 @@ const defaultServices: Service[] = [
   { id: '2', name: 'Wise', price: '30$', order: 2, active: true },
   { id: '3', name: 'Skrill', price: '20$', order: 3, active: true },
   { id: '4', name: 'Neteller', price: '20$', order: 4, active: true },
-  { id: '5', name: 'PayPal', price: '15$', order: 5, active: true },
+  { id: '5', name: 'Kast', price: '20$', order: 5, active: true },
+  { id: '6', name: 'Redotpay', price: '20$', order: 6, active: true },
+  { id: '7', name: 'Okx', price: '20$', order: 7, active: true },
+  { id: '8', name: 'World First', price: '20$', order: 8, active: true },
+  { id: '9', name: 'Bybit', price: '20$', order: 9, active: true },
+  { id: '10', name: 'Bitget', price: '20$', order: 10, active: true },
+  { id: '11', name: 'Kucoin', price: '20$', order: 11, active: true },
+  { id: '12', name: 'PayPal', price: '15$', order: 12, active: true },
+  { id: '13', name: 'Mexc', price: '20$', order: 13, active: true },
+  { id: '14', name: 'Exness', price: '20$', order: 14, active: true },
+  { id: '15', name: 'شحن رصيد فودافون', price: '100 جنيه = 120 جنيه', order: 15, active: true },
+  { id: '16', name: 'سحب من TikTok', price: 'حسب المبلغ', order: 16, active: true },
+  { id: '17', name: 'سحب من PayPal', price: 'حسب المبلغ', order: 17, active: true },
 ];
 
 const defaultPaymentMethods: PaymentMethod[] = [
@@ -131,7 +143,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setServices(prev => prev.map(s => s.id === id ? { ...s, ...service } : s));
       toast.success('تم تحديث الخدمة بنجاح');
     } catch (err) {
-      toast.error('ف��ل في تحديث الخدمة');
+      toast.error('فشل في تحديث الخدمة');
     }
   };
 
