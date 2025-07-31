@@ -98,42 +98,45 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      const [servicesData, paymentMethodsData, ordersData, siteSettingsData] = await Promise.all([
-        servicesService.getAll(),
-        paymentMethodsService.getAll(),
-        ordersService.getAll(),
-        siteSettingsService.get().catch(() => defaultSiteSettings)
-      ]);
+      // جرب تحميل البيانات من قاعدة البيانات مع timeout
+      const loadDataWithTimeout = (promise: Promise<any>, timeout = 5000) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error('Database timeout')), timeout)
+          )
+        ]);
+      };
 
-      setServices(servicesData);
-      setPaymentMethods(paymentMethodsData);
-      setOrders(ordersData);
-      setSiteSettings(siteSettingsData);
+      try {
+        const [servicesData, paymentMethodsData, ordersData, siteSettingsData] = await Promise.all([
+          loadDataWithTimeout(servicesService.getAll()),
+          loadDataWithTimeout(paymentMethodsService.getAll()),
+          loadDataWithTimeout(ordersService.getAll()),
+          loadDataWithTimeout(siteSettingsService.get()).catch(() => defaultSiteSettings)
+        ]);
+
+        setServices(servicesData);
+        setPaymentMethods(paymentMethodsData);
+        setOrders(ordersData);
+        setSiteSettings(siteSettingsData);
+        setError(null);
+      } catch (dbError) {
+        console.warn('Database not available, using fallback data:', dbError);
+        throw dbError;
+      }
     } catch (err) {
-      console.error('Error loading data:', err);
-      setError('حدث خطأ في تحميل البيانات');
-      
-      // Fallback to localStorage if database fails
+      console.error('Using fallback data due to error:', err);
+
+      // استخدم البيانات الاحتياطية من localStorage أو البيانات الافتراضية
       const savedServices = localStorage.getItem('kyctrust_services');
       const savedPaymentMethods = localStorage.getItem('kyctrust_payment_methods');
       const savedSiteSettings = localStorage.getItem('kyctrust_site_settings');
       const savedOrders = localStorage.getItem('kyctrust_orders');
 
-      if (savedServices) {
-        setServices(JSON.parse(savedServices));
-      } else {
-        setServices(defaultServices);
-      }
-
-      if (savedPaymentMethods) {
-        setPaymentMethods(JSON.parse(savedPaymentMethods));
-      } else {
-        setPaymentMethods(defaultPaymentMethods);
-      }
-
-      if (savedSiteSettings) {
-        setSiteSettings(JSON.parse(savedSiteSettings));
-      }
+      setServices(savedServices ? JSON.parse(savedServices) : defaultServices);
+      setPaymentMethods(savedPaymentMethods ? JSON.parse(savedPaymentMethods) : defaultPaymentMethods);
+      setSiteSettings(savedSiteSettings ? JSON.parse(savedSiteSettings) : defaultSiteSettings);
 
       if (savedOrders) {
         const parsedOrders = JSON.parse(savedOrders);
@@ -141,7 +144,12 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           ...order,
           timestamp: new Date(order.timestamp)
         })));
+      } else {
+        setOrders([]);
       }
+
+      // اعرض تحذيراً بدلاً من خطأ إذا كانت البيانات الاحتياطية متوفرة
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -157,7 +165,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const updateService = async (id: string, updates: Partial<Service>) => {
     try {
-      const updatedService = await servicesService.update(id, updates);
+      // حاول التحديث في قاعدة البيانات أولاً
+      let updatedService;
+      try {
+        updatedService = await servicesService.update(id, updates);
+      } catch (dbError) {
+        // إذا فشل، استخدم البيانات المحلية
+        const service = services.find(s => s.id === id);
+        if (!service) throw new Error('Service not found');
+        updatedService = { ...service, ...updates };
+      }
+
       const updatedServices = services.map(service =>
         service.id === id ? updatedService : service
       );
@@ -172,7 +190,17 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const addService = async (service: Omit<Service, 'id'>) => {
     try {
-      const newService = await servicesService.create(service);
+      let newService;
+      try {
+        newService = await servicesService.create(service);
+      } catch (dbError) {
+        // إذا فشل، أنشئ معرف محلي
+        newService = {
+          ...service,
+          id: Date.now().toString()
+        };
+      }
+
       const updatedServices = [...services, newService];
       setServices(updatedServices);
       saveToStorage('kyctrust_services', updatedServices);
@@ -251,7 +279,18 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const addOrder = async (order: Omit<Order, 'id' | 'timestamp'>) => {
     try {
-      const newOrder = await ordersService.create(order);
+      let newOrder;
+      try {
+        newOrder = await ordersService.create(order);
+      } catch (dbError) {
+        // إذا فشل، أنشئ طلب محلي
+        newOrder = {
+          ...order,
+          id: Date.now().toString(),
+          timestamp: new Date()
+        };
+      }
+
       const updatedOrders = [newOrder, ...orders];
       setOrders(updatedOrders);
       saveToStorage('kyctrust_orders', updatedOrders);
