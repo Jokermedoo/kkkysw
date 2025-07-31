@@ -6,6 +6,7 @@ import ModernHero from './modern/ModernHero';
 import EnhancedMagicalServices from './modern/EnhancedMagicalServices';
 import InteractiveFeatures from './modern/InteractiveFeatures';
 import TestimonialsSection from './modern/TestimonialsSection';
+import FAQSection from './modern/FAQSection';
 import ModernCTA from './modern/ModernCTA';
 import { useTheme } from '../context/ThemeContext';
 
