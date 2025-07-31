@@ -89,21 +89,7 @@ const ServicesModal: React.FC<ServicesModalProps> = ({ isOpen, onClose }) => {
 
   const filteredServices = getFilteredServices();
 
-  // تحديد الأيقونة حسب نوع الخدمة
-  const getServiceIcon = (serviceName: string) => {
-    if (serviceName.includes('PayPal') || serviceName.includes('Wise')) return CreditCard;
-    if (serviceName.includes('Bitcoin') || serviceName.includes('Okx') || serviceName.includes('Bybit')) return Bitcoin;
-    if (serviceName.includes('فودافون') || serviceName.includes('TikTok')) return Smartphone;
-    return DollarSign;
-  };
 
-  // تحديد اللون حسب نوع الخدمة
-  const getServiceColor = (serviceName: string) => {
-    if (serviceName.includes('PayPal') || serviceName.includes('Wise')) return 'from-blue-500 to-blue-600';
-    if (serviceName.includes('Bitcoin') || serviceName.includes('Okx') || serviceName.includes('Bybit')) return 'from-yellow-500 to-orange-500';
-    if (serviceName.includes('فودافون') || serviceName.includes('TikTok')) return 'from-green-500 to-green-600';
-    return 'from-purple-500 to-purple-600';
-  };
 
   // إضافة/إزالة خدمة من المختارة
   const toggleService = (serviceId: string) => {
@@ -221,7 +207,7 @@ const ServicesModal: React.FC<ServicesModalProps> = ({ isOpen, onClose }) => {
                   لا توجد خدمات
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  جرب تغيير مصطلح البحث أو ��لتصنيف
+                  جرب تغيير مصطلح البحث أو التصنيف
                 </p>
               </div>
             )}
