@@ -1,229 +1,185 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Zap, Shield, Award, Users, Clock, Star, 
-  TrendingUp, CheckCircle, AlertCircle, Gift,
-  Timer, Flame, Crown, Sparkles
-} from 'lucide-react';
+import { Star, Shield, Clock, Award, Zap, TrendingUp, Users, CheckCircle } from 'lucide-react';
 
 const MarketingElements: React.FC = () => {
   const [currentOffer, setCurrentOffer] = useState(0);
-  const [timeLeft, setTimeLeft] = useState({
-    hours: 23,
-    minutes: 45,
-    seconds: 30
-  });
+  const [timeLeft, setTimeLeft] = useState({ hours: 23, minutes: 45, seconds: 30 });
 
-  // العروض المتناوبة
   const offers = [
-    {
-      title: 'عرض خاص لفترة محدودة!',
-      description: 'خصم 20% على جميع الخدمات',
-      color: 'from-red-500 to-pink-500',
-      icon: <Flame className="h-5 w-5" />
-    },
-    {
-      title: 'أول 100 عميل',
-      description: 'خدمة مجانية إضافية',
-      color: 'from-purple-500 to-indigo-500',
-      icon: <Crown className="h-5 w-5" />
-    },
-    {
-      title: 'خدمة سريعة',
-      description: 'تنفيذ خلال 10 دقائق',
-      color: 'from-green-500 to-emerald-500',
-      icon: <Zap className="h-5 w-5" />
-    }
+    '🔥 خصم 20% على جميع الخدمات - عرض محدود!',
+    '⚡ توصيل فوري خلال 30 دقيقة',
+    '🎁 خدمة مجانية عند طلب 3 خدمات',
+    '🏆 أكثر من 10,000 عميل راضٍ'
   ];
 
-  // تبديل العروض كل 5 ثوان
   useEffect(() => {
-    const offerTimer = setInterval(() => {
+    const offerInterval = setInterval(() => {
       setCurrentOffer((prev) => (prev + 1) % offers.length);
-    }, 5000);
+    }, 4000);
 
-    return () => clearInterval(offerTimer);
+    return () => clearInterval(offerInterval);
   }, [offers.length]);
 
-  // العد التنازلي
   useEffect(() => {
-    const countdownTimer = setInterval(() => {
+    const timer = setInterval(() => {
       setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 };
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 };
-        } else if (prev.hours > 0) {
-          return { hours: prev.hours - 1, minutes: 59, seconds: 59 };
+        let { hours, minutes, seconds } = prev;
+        
+        if (seconds > 0) {
+          seconds--;
+        } else if (minutes > 0) {
+          minutes--;
+          seconds = 59;
+        } else if (hours > 0) {
+          hours--;
+          minutes = 59;
+          seconds = 59;
         } else {
-          return { hours: 23, minutes: 59, seconds: 59 };
+          hours = 23;
+          minutes = 59;
+          seconds = 59;
         }
+        
+        return { hours, minutes, seconds };
       });
     }, 1000);
 
-    return () => clearInterval(countdownTimer);
+    return () => clearInterval(timer);
   }, []);
 
-  const currentOfferData = offers[currentOffer];
+  const trustIndicators = [
+    { icon: Shield, text: 'آمان 100%', color: 'text-green-600' },
+    { icon: Clock, text: 'سرعة في التسليم', color: 'text-blue-600' },
+    { icon: Award, text: 'جودة مضمونة', color: 'text-yellow-600' },
+    { icon: Users, text: '+10K عميل', color: 'text-purple-600' }
+  ];
+
+  const stats = [
+    { number: '10,432', label: 'عميل راضٍ', icon: Users },
+    { number: '99.9%', label: 'نسبة النجاح', icon: TrendingUp },
+    { number: '24/7', label: 'دعم متواصل', icon: Clock },
+    { number: '5⭐', label: 'تقييم العملاء', icon: Star }
+  ];
 
   return (
-    <div className="space-y-6">
-      {/* شريط العروض المتحرك */}
-      <div className="bg-gradient-to-r from-red-600 to-pink-600 text-white py-2 overflow-hidden">
+    <>
+      {/* Top Banner */}
+      <div className="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 text-white py-2 sticky top-0 z-50 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap">
-          <span className="mx-8 inline-flex items-center space-x-reverse space-x-2">
-            <Sparkles className="h-4 w-4" />
-            <span>🔥 عرض حصري: خصم 25% على الخدمات الرقمية - لفترة محدودة!</span>
+          <span className="text-sm font-medium px-4">
+            {offers[currentOffer]} | اتصل الآن: 01062453344 | 
           </span>
-          <span className="mx-8 inline-flex items-center space-x-reverse space-x-2">
-            <Award className="h-4 w-4" />
-            <span>⭐ أكثر من 1000 عميل راضٍ عن خدماتنا</span>
-          </span>
-          <span className="mx-8 inline-flex items-center space-x-reverse space-x-2">
-            <Clock className="h-4 w-4" />
-            <span>⚡ خدمة سريعة خلال 15 دقيقة</span>
+          <span className="text-sm font-medium px-4">
+            {offers[(currentOffer + 1) % offers.length]} | 
           </span>
         </div>
       </div>
 
-      {/* بانر العرض الرئيسي */}
-      <div className="relative overflow-hidden">
-        <div className={`bg-gradient-to-r ${currentOfferData.color} rounded-2xl p-6 text-white relative`}>
-          <div className="absolute inset-0 bg-black/10"></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-reverse space-x-4">
-                <div className="bg-white/20 p-3 rounded-full">
-                  {currentOfferData.icon}
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-1">{currentOfferData.title}</h3>
-                  <p className="text-white/90">{currentOfferData.description}</p>
-                </div>
-              </div>
-              
-              {/* العد التنازلي */}
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 text-center">
-                <div className="text-xs text-white/80 mb-1">ينتهي خلال</div>
-                <div className="flex space-x-1">
-                  <div className="bg-white/30 rounded px-2 py-1 min-w-[2rem]">
-                    <span className="text-sm font-bold">{timeLeft.hours.toString().padStart(2, '0')}</span>
-                  </div>
-                  <span className="text-white/60">:</span>
-                  <div className="bg-white/30 rounded px-2 py-1 min-w-[2rem]">
-                    <span className="text-sm font-bold">{timeLeft.minutes.toString().padStart(2, '0')}</span>
-                  </div>
-                  <span className="text-white/60">:</span>
-                  <div className="bg-white/30 rounded px-2 py-1 min-w-[2rem]">
-                    <span className="text-sm font-bold">{timeLeft.seconds.toString().padStart(2, '0')}</span>
-                  </div>
-                </div>
-                <div className="text-xs text-white/60 mt-1">س : د : ث</div>
-              </div>
+      {/* Countdown Timer */}
+      <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black py-3">
+        <div className="max-w-4xl mx-auto px-4 flex items-center justify-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Zap className="h-5 w-5 animate-pulse" />
+            <span className="font-bold">العرض ينتهي خلال:</span>
+          </div>
+          <div className="flex space-x-2">
+            <div className="bg-black text-white px-2 py-1 rounded text-sm font-mono">
+              {timeLeft.hours.toString().padStart(2, '0')}
+            </div>
+            <span>:</span>
+            <div className="bg-black text-white px-2 py-1 rounded text-sm font-mono">
+              {timeLeft.minutes.toString().padStart(2, '0')}
+            </div>
+            <span>:</span>
+            <div className="bg-black text-white px-2 py-1 rounded text-sm font-mono">
+              {timeLeft.seconds.toString().padStart(2, '0')}
             </div>
           </div>
-          
-          {/* مؤشرات العروض */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
-            {offers.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentOffer ? 'bg-white' : 'bg-white/40'
-                }`}
-              />
+        </div>
+      </div>
+
+      {/* Trust Indicators */}
+      <div className="bg-white border-b border-gray-100 py-4">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {trustIndicators.map((indicator, index) => (
+              <div key={index} className="flex items-center justify-center space-x-2 p-2">
+                <indicator.icon className={`h-5 w-5 ${indicator.color}`} />
+                <span className="text-sm font-medium text-gray-700">{indicator.text}</span>
+              </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* مؤشرات الثقة */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100 text-center">
-          <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-            <CheckCircle className="h-6 w-6 text-green-600" />
-          </div>
-          <div className="text-2xl font-bold text-gray-900">100%</div>
-          <div className="text-xs text-gray-600">آمان مضمون</div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100 text-center">
-          <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-            <Clock className="h-6 w-6 text-blue-600" />
-          </div>
-          <div className="text-2xl font-bold text-gray-900">15</div>
-          <div className="text-xs text-gray-600">دقيقة تنفيذ</div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100 text-center">
-          <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-            <Users className="h-6 w-6 text-purple-600" />
-          </div>
-          <div className="text-2xl font-bold text-gray-900">1K+</div>
-          <div className="text-xs text-gray-600">عميل راضٍ</div>
-        </div>
-
-        <div className="bg-white rounded-xl p-4 shadow-md border border-gray-100 text-center">
-          <div className="bg-yellow-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-2">
-            <Star className="h-6 w-6 text-yellow-600" />
-          </div>
-          <div className="text-2xl font-bold text-gray-900">4.9</div>
-          <div className="text-xs text-gray-600">تقييم العملاء</div>
-        </div>
-      </div>
-
-      {/* شارات الأمان والجودة */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          <div className="flex items-center space-x-reverse space-x-2">
-            <Shield className="h-5 w-5 text-blue-600" />
-            <span className="text-sm font-medium text-blue-800">حماية SSL</span>
-          </div>
-          <div className="flex items-center space-x-reverse space-x-2">
-            <Award className="h-5 w-5 text-green-600" />
-            <span className="text-sm font-medium text-green-800">ضمان الجودة</span>
-          </div>
-          <div className="flex items-center space-x-reverse space-x-2">
-            <CheckCircle className="h-5 w-5 text-purple-600" />
-            <span className="text-sm font-medium text-purple-800">معتمد دولياً</span>
-          </div>
-          <div className="flex items-center space-x-reverse space-x-2">
-            <TrendingUp className="h-5 w-5 text-orange-600" />
-            <span className="text-sm font-medium text-orange-800">الأسرع نمواً</span>
+      {/* Stats Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
+            أرقام تتحدث عن نفسها
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center p-4 bg-white rounded-xl shadow-sm">
+                <stat.icon className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">{stat.number}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* تحذير العرض المحدود */}
-      <div className="bg-gradient-to-r from-red-50 to-orange-50 border-l-4 border-red-500 p-4 rounded-lg">
-        <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 ml-2" />
-          <div>
-            <p className="text-sm font-medium text-red-800">
-              ⚠️ عرض محدود: متبقي 15 مقعد فقط بالسعر الخاص!
-            </p>
-            <p className="text-xs text-red-600 mt-1">
-              احجز مكانك الآن قبل انتهاء العرض
+      {/* Testimonials Slider */}
+      <div className="bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <h3 className="text-2xl font-bold text-center text-gray-900 mb-6">
+            ماذا يقول عملاؤنا
+          </h3>
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="bg-blue-100 rounded-full p-3">
+                <User className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-gray-900">أحمد محمد</h4>
+                <div className="flex space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="h-4 w-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 italic">
+              "خدمة ممتازة وسريعة! ��صلت على حساب Payoneer الخاص بي خلال 30 دقيقة فقط. أنصح بشدة!"
             </p>
           </div>
         </div>
       </div>
 
-      {/* أنيميشن CSS للنص المتحرك */}
-      <style jsx>{`
-        @keyframes marquee {
-          0% {
-            transform: translateX(100%);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-        .animate-marquee {
-          animation: marquee 20s linear infinite;
-        }
-      `}</style>
-    </div>
+      {/* Urgent Action */}
+      <div className="bg-gradient-to-r from-red-500 to-pink-500 text-white py-4">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="flex items-center justify-center space-x-2 mb-2">
+            <div className="animate-pulse bg-white rounded-full p-1">
+              <CheckCircle className="h-4 w-4 text-red-500" />
+            </div>
+            <span className="font-bold">عرض خاص - لفترة محدودة!</span>
+          </div>
+          <p className="text-sm opacity-90">
+            احصل على خصم 20% على أول طلب + خدمة إضافية مجاناً
+          </p>
+        </div>
+      </div>
+    </>
   );
 };
+
+// User icon component (since it's not imported)
+const User: React.FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+  </svg>
+);
 
 export default MarketingElements;
