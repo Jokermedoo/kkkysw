@@ -41,6 +41,13 @@ interface DataContextType {
   error: string | null;
   addOrder: (order: Omit<Order, 'id' | 'timestamp'>) => void;
   refreshData: () => Promise<void>;
+  updateService?: (id: string, service: Partial<Service>) => Promise<void>;
+  addService?: (service: Omit<Service, 'id'>) => Promise<void>;
+  deleteService?: (id: string) => Promise<void>;
+  updatePaymentMethod?: (id: string, method: Partial<PaymentMethod>) => Promise<void>;
+  addPaymentMethod?: (method: Omit<PaymentMethod, 'id'>) => Promise<void>;
+  deletePaymentMethod?: (id: string) => Promise<void>;
+  updateSiteSettings?: (settings: Partial<SiteSettings>) => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
