@@ -288,7 +288,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         updatedService = await servicesService.update(id, updates);
       } catch (dbError) {
-        // إذا فشل، استخدم البيانات المحلية
+        // إذا فشل، استخدم البيانات ��لمحلية
         const service = services.find(s => s.id === id);
         if (!service) throw new Error('Service not found');
         updatedService = { ...service, ...updates };
@@ -324,7 +324,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       saveToStorage('kyctrust_services', updatedServices);
       toast.success('تم إضافة الخدمة بنجاح');
     } catch (err) {
-      console.error('Error adding service:', err);
+      console.error('Error adding service:', handleSupabaseError(err));
       toast.error('حدث خطأ في إضافة الخدمة');
     }
   };
@@ -353,7 +353,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('تم تحديث طريقة الدفع بنجاح');
     } catch (err) {
       console.error('Error updating payment method:', err);
-      toast.error('حدث خطأ في تح��يث طريقة الدفع');
+      toast.error('حدث خطأ في تحديث طريقة الدفع');
     }
   };
 
