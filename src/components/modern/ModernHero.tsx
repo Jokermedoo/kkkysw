@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Sparkles, Zap, Shield, Star, Play, ChevronDown } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Shield, Star, ChevronDown, MessageCircle } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useInView, useMousePosition } from '../../hooks/useInView';
 import Button from '../ui/Button';
@@ -32,7 +32,7 @@ const ModernHero: React.FC = () => {
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/50 dark:from-gray-900 dark:via-blue-900/20 dark:to-purple-900/30"
     >
       
-      {/* خلفية متحركة متطورة */}
+      {/* خلفية متحر��ة متطورة */}
       <div className="absolute inset-0">
         {/* شبكة الخلفية */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]"></div>
@@ -165,7 +165,7 @@ const ModernHero: React.FC = () => {
                 className="group"
                 onClick={() => window.open('https://wa.me/201062453344?text=مرحباً، أريد الاستفسار عن خدماتكم', '_blank')}
               >
-                تواصل معنا مباشرة
+                تواصل معنا م��اشرة
               </Button>
             </div>
 
