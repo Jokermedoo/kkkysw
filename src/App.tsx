@@ -56,7 +56,7 @@ function App() {
               path="/admin/*" 
               element={
                 isAdminAuthenticated ? (
-                  <EnhancedAdminPanel onLogout={handleAdminLogout} />
+                  <ImprovedAdminPanel onLogout={handleAdminLogout} />
                 ) : (
                   <Navigate to="/admin/login" replace />
                 )
