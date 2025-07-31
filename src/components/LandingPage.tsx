@@ -6,6 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 import ErrorMessage from './ErrorMessage';
 import SearchAndFilter from './SearchAndFilter';
 import StatsCard from './StatsCard';
+import ContactSection from './ContactSection';
 
 const LandingPage: React.FC = () => {
   const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
@@ -399,37 +400,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Contact Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-indigo-600">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8">
-            <MessageCircle className="h-12 w-12 text-white mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-4">
-              تواصل معنا
-            </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              فريق الدعم متاح لمساعدتك في أي وقت
-            </p>
-          </div>
-          
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-blue-400">
-            <p className="text-lg text-blue-100">
-              {siteSettings.orderNotice}
-            </p>
-          </div>
-          
-          <div className="mt-8">
-            <a
-              href="https://wa.me/201062453344"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center px-8 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors space-x-reverse space-x-2"
-            >
-              <MessageCircle className="h-5 w-5" />
-              <span>تواصل عبر واتساب</span>
-            </a>
-          </div>
-        </div>
-      </section>
+      <ContactSection />
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 px-4 sm:px-6 lg:px-8">
