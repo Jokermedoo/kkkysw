@@ -121,6 +121,32 @@ export default {
           '0%, 100%': { transform: 'scale(1)' },
           '50%': { transform: 'scale(1.05)' },
         },
+        floatX: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(20px)' },
+        },
+        floatY: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-15px)' },
+        },
+        particle: {
+          '0%': { transform: 'translateY(100vh) translateX(0) rotate(0deg)', opacity: '0' },
+          '10%': { opacity: '1' },
+          '90%': { opacity: '1' },
+          '100%': { transform: 'translateY(-10vh) translateX(100px) rotate(360deg)', opacity: '0' },
+        },
+        glowPulse: {
+          '0%, 100%': {
+            'box-shadow': '0 0 20px rgba(59, 130, 246, 0.3), 0 0 40px rgba(59, 130, 246, 0.1)'
+          },
+          '50%': {
+            'box-shadow': '0 0 40px rgba(59, 130, 246, 0.6), 0 0 80px rgba(59, 130, 246, 0.3)'
+          },
+        },
+        textGlow: {
+          '0%': { 'text-shadow': '0 0 10px rgba(59, 130, 246, 0.5)' },
+          '100%': { 'text-shadow': '0 0 20px rgba(59, 130, 246, 1), 0 0 30px rgba(147, 51, 234, 0.5)' },
+        },
       },
       backdropBlur: {
         xs: '2px',
