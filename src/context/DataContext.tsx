@@ -275,7 +275,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('✅ Using cached data successfully');
       } else {
         setError('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
-        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا��ات المحلية');
+        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيانات المحلية');
       }
     } finally {
       setLoading(false);
