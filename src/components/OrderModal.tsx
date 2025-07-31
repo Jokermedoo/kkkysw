@@ -7,6 +7,12 @@ interface OrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   serviceName: string;
+  paymentMethods?: Array<{
+    id: string;
+    name: string;
+    details: string;
+    active: boolean;
+  }>;
 }
 
 const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, serviceName }) => {
