@@ -206,6 +206,250 @@ const EnhancedAdminPanel: React.FC = () => {
     </div>
   );
 
+  const renderOrders = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold text-gray-900">إدارة الطلبات</h3>
+            <div className="flex space-x-reverse space-x-4">
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <input
+                  type="text"
+                  placeholder="بحث في الطلبات..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-4 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <select
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="all">جميع التواريخ</option>
+                <option value="today">اليوم</option>
+                <option value="week">هذا الأسبوع</option>
+                <option value="month">هذا الشهر</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">العميل</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الخدمة</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الملاحظات</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التاريخ</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {orders
+                .filter(order =>
+                  order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  order.serviceName.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((order) => (
+                <tr key={order.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {order.customerName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {order.serviceName}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                    {order.notes || 'لا توجد ملاحظات'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(order.timestamp).toLocaleDateString('ar-EG')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      order.archived
+                        ? 'bg-gray-100 text-gray-800'
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {order.archived ? 'مكتمل' : 'جاري المعالجة'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <div className="flex space-x-reverse space-x-2">
+                      <button className="text-blue-600 hover:text-blue-800">
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button className="text-green-600 hover:text-green-800">
+                        تم الإنجاز
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderPayments = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-lg font-semibold text-gray-900">إدارة طرق الدفع</h3>
+          <button
+            onClick={() => setShowNewPaymentForm(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-reverse space-x-2"
+          >
+            <Plus className="h-4 w-4" />
+            <span>إضافة طريقة دفع</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {paymentMethods.map((method) => (
+            <div key={method.id} className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-semibold text-gray-900">{method.name}</h4>
+                <button
+                  onClick={() => updatePaymentMethod(method.id, { active: !method.active })}
+                  className={`p-1 rounded-full ${
+                    method.active
+                      ? 'text-green-600 hover:bg-green-100'
+                      : 'text-red-600 hover:bg-red-100'
+                  } transition-colors`}
+                >
+                  {method.active ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </button>
+              </div>
+              <div className="bg-gray-100 rounded-lg p-3 mb-4">
+                <p className="text-sm font-mono text-gray-800 break-all">{method.details}</p>
+              </div>
+              <div className="flex space-x-reverse space-x-2">
+                <button
+                  onClick={() => setEditingPayment(method)}
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                >
+                  تعديل
+                </button>
+                <button
+                  onClick={() => deletePaymentMethod(method.id)}
+                  className="text-red-600 hover:text-red-800 text-sm"
+                >
+                  حذف
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSettings = () => (
+    <div className="space-y-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">إعدادات الموقع</h3>
+
+        <form className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              عنوان الموقع
+            </label>
+            <input
+              type="text"
+              value={siteSettings.title}
+              onChange={(e) => updateSiteSettings({ ...siteSettings, title: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              وصف الموقع
+            </label>
+            <textarea
+              value={siteSettings.description}
+              onChange={(e) => updateSiteSettings({ ...siteSettings, description: e.target.value })}
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              إشعار الطلبات
+            </label>
+            <textarea
+              value={siteSettings.orderNotice}
+              onChange={(e) => updateSiteSettings({ ...siteSettings, orderNotice: e.target.value })}
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  const renderAnalytics = () => (
+    <div className="space-y-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">الإيرادات اليومية</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="revenue" stroke="#10B981" strokeWidth={3} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">توزيع الطلبات</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={servicePopularity}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Bar dataKey="orders" fill="#3B82F6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 mb-6">تقرير شامل</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-600 mb-2">{stats.totalOrders}</div>
+            <div className="text-gray-600">إجمالي الطلبات</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600 mb-2">${stats.totalRevenue}</div>
+            <div className="text-gray-600">إجمالي الإيرادات</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-600 mb-2">{stats.thisWeekOrders}</div>
+            <div className="text-gray-600">طلبات هذا الأسبوع</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-orange-600 mb-2">{stats.todayOrders}</div>
+            <div className="text-gray-600">طلبات اليوم</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderServices = () => (
     <div className="space-y-6">
       <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
@@ -329,7 +573,10 @@ const EnhancedAdminPanel: React.FC = () => {
 
           {activeTab === 'dashboard' && renderDashboard()}
           {activeTab === 'services' && renderServices()}
-          {/* باقي التبويبات سيتم إضافتها */}
+          {activeTab === 'orders' && renderOrders()}
+          {activeTab === 'payments' && renderPayments()}
+          {activeTab === 'settings' && renderSettings()}
+          {activeTab === 'analytics' && renderAnalytics()}
         </main>
       </div>
     </div>
