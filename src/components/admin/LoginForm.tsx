@@ -16,9 +16,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     const savedPassword = localStorage.getItem('kyctrust_admin_password') || 'admin123123';
     
     if (password === savedPassword) {
-      onLogin();
+      onLogin(true);
       toast.success('تم تسجيل الدخول بنجاح');
     } else {
+      onLogin(false);
       toast.error('كلمة المرور غير صحيحة');
     }
   };
@@ -30,7 +31,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
       setCurrentPassword(newPassword);
       toast.success('تم تغيير كلمة المرور بنجاح');
     } else if (newPassword) {
-      toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      toast.error('كلمة المرور يج�� أن تكون 6 أحرف على الأقل');
     }
   };
 
