@@ -109,17 +109,29 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setLoading(true);
       setError(null);
 
-      // استيراد أدوات الإعداد المتقدمة
+      // استيراد أدوات الإعداد والاختبار السريع
       console.log('🚀 Starting enhanced data refresh...');
-      
+
       let setupUtils;
       try {
+        // تشغيل اختبار سريع أولاً
+        const { quickSupabaseTest } = await import('../utils/quick-test');
+        const quickTest = await quickSupabaseTest();
+
+        if (!quickTest.success) {
+          console.warn('⚠️ Quick test failed:', quickTest.message);
+          quickTest.details.forEach(detail => console.log(detail));
+          throw new Error(quickTest.message);
+        } else {
+          console.log('✅ Quick test passed');
+        }
+
         setupUtils = await import('../utils/supabase-setup');
       } catch (importError) {
         console.warn('⚠️ Could not import setup utils, using basic connection test');
         const connectionTest = await testSupabaseConnection();
         if (!connectionTest.success) {
-          throw new Error(connectionTest.error || 'Connection failed');
+          throw new Error(handleSupabaseError(connectionTest.error) || 'Connection failed');
         }
         setupUtils = null;
       }
@@ -262,7 +274,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('✅ Using cached data successfully');
       } else {
         setError('لا يمكن الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.');
-        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا��ات المحلية');
+        toast.error('لا يمكن الاتصال بقاعدة البيانات، يتم استخدام البيا����ات المحلية');
       }
     } finally {
       setLoading(false);
@@ -302,7 +314,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       toast.success('تم تحديث الخدمة بنجاح');
     } catch (err) {
       console.error('Error updating service:', handleSupabaseError(err));
-      toast.error('حدث خطأ في تحديث الخدمة');
+      toast.error('حدث خطأ في ت��ديث الخدمة');
     }
   };
 
