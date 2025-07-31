@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { X, Send, User, FileText, Shield, Clock } from 'lucide-react';
+import { X, Send, User, MessageSquare, Phone, Mail } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import StatusNotification from './StatusNotification';
 
 interface OrderModalProps {
   isOpen: boolean;
@@ -9,145 +10,170 @@ interface OrderModalProps {
 }
 
 const OrderModal: React.FC<OrderModalProps> = ({ isOpen, onClose, serviceName }) => {
-  const { addOrder, siteSettings } = useData();
-  const [formData, setFormData] = useState({
-    customerName: '',
-    notes: ''
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (formData.customerName.trim()) {
-      addOrder({
-        customerName: formData.customerName.trim(),
-        serviceName,
-        notes: formData.notes.trim(),
-        archived: false
-      });
-      setFormData({ customerName: '', notes: '' });
-      onClose();
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const { addOrder } = useData();
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   if (!isOpen) return null;
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customerName.trim()) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      await addOrder({
+        customerName: customerName.trim(),
+        serviceName,
+        notes: `${notes}\n\nتفاصيل الاتصال:\nالهاتف: ${phone}\nالإيميل: ${email}`.trim(),
+        archived: false
+      });
+
+      setShowSuccess(true);
+      
+      // إعادة تعيين النموذج
+      setCustomerName('');
+      setPhone('');
+      setEmail('');
+      setNotes('');
+      
+      // إغلاق النافذة بعد 2 ثانية
+      setTimeout(() => {
+        onClose();
+        setShowSuccess(false);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error submitting order:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-reverse space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Send className="h-5 w-5 text-blue-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">طلب خدمة</h2>
-            </div>
+    <>
+      <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto animate-slide-up">
+          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+            <h2 className="text-xl font-bold text-gray-900">طلب خدمة جديدة</h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors group"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              <X className="h-5 w-5 text-gray-500 group-hover:text-gray-700" />
+              <X className="h-6 w-6" />
             </button>
           </div>
 
-          {/* Service Info */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 mb-6 border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">الخدمة المطلوبة:</h3>
-            <div className="flex items-center space-x-reverse space-x-2">
-              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-              <p className="text-blue-700 font-medium">{serviceName}</p>
+          <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                الخدمة المطلوبة
+              </label>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-3">
+                <p className="text-blue-800 font-semibold">{serviceName}</p>
+              </div>
             </div>
-          </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="customerName" className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center space-x-reverse space-x-2">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <span>اسم العميل *</span>
-                </div>
+                <User className="h-4 w-4 inline ml-1" />
+                الاسم الكامل *
               </label>
               <input
                 type="text"
                 id="customerName"
-                name="customerName"
-                value={formData.customerName}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="أدخل اسمك الكامل"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                <Phone className="h-4 w-4 inline ml-1" />
+                رقم الهاتف
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="01XXXXXXXXX"
+                dir="ltr"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                <Mail className="h-4 w-4 inline ml-1" />
+                البريد الإلكتروني
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="example@email.com"
+                dir="ltr"
               />
             </div>
 
             <div>
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700 mb-2">
-                <div className="flex items-center space-x-reverse space-x-2">
-                  <FileText className="h-4 w-4 text-blue-600" />
-                  <span>ملاحظات إضافية (اختياري)</span>
-                </div>
+                <MessageSquare className="h-4 w-4 inline ml-1" />
+                ملاحظات إضافية
               </label>
               <textarea
                 id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleChange}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
-                placeholder="أضف أي تفاصيل إضافية أو طلبات خاصة..."
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                placeholder="أي تفاصيل إضافية تود إضافتها..."
               />
             </div>
 
-            {/* Security Notice */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <div className="flex items-center space-x-reverse space-x-2 mb-2">
-                <Shield className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-800">ضمان الأمان</span>
-              </div>
-              <p className="text-xs text-green-700">
-                جميع بياناتك محمية ومشفرة. نحن نحترم خصوصيتك ولا نشارك معلوماتك مع أطراف ثالثة.
-              </p>
-            </div>
-            {/* Notice */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <div className="flex items-center space-x-reverse space-x-2 mb-2">
-                <Clock className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">معلومات مهمة</span>
-              </div>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4">
               <p className="text-sm text-blue-700">
-                <strong>تنبيه:</strong> {siteSettings.orderNotice}
+                💡 سيتم التواصل معك عبر واتساب خلال 30 دقيقة لتأكيد الطلب وإرسال التفاصيل.
               </p>
             </div>
 
-            {/* Buttons */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2 hover:scale-105 transform"
-              >
-                <Send className="h-4 w-4" />
-                <span>إرسال الطلب</span>
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50 transition-colors hover:border-gray-400"
-              >
-                إلغاء
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting || !customerName.trim()}
+              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center space-x-reverse space-x-2"
+            >
+              {isSubmitting ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+              ) : (
+                <>
+                  <Send className="h-5 w-5" />
+                  <span>إرسال الطلب</span>
+                </>
+              )}
+            </button>
           </form>
         </div>
       </div>
-    </div>
+
+      {showSuccess && (
+        <StatusNotification
+          type="success"
+          message="تم إرسال طلبك بنجاح! سنتواصل معك قريباً."
+          onClose={() => setShowSuccess(false)}
+        />
+      )}
+    </>
   );
 };
 
