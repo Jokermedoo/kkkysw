@@ -124,6 +124,86 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  // إدارة الخدمات
+  const updateService = async (id: string, service: Partial<Service>) => {
+    try {
+      await servicesService.update(id, service);
+      setServices(prev => prev.map(s => s.id === id ? { ...s, ...service } : s));
+      toast.success('تم تحديث الخدمة بنجاح');
+    } catch (err) {
+      toast.error('فشل في تحديث الخدمة');
+    }
+  };
+
+  const addService = async (service: Omit<Service, 'id'>) => {
+    try {
+      const newService = await servicesService.create(service);
+      setServices(prev => [...prev, newService]);
+      toast.success('تم إضافة الخدمة بنجاح');
+    } catch (err) {
+      const newService = { ...service, id: Date.now().toString() };
+      setServices(prev => [...prev, newService]);
+      toast.success('تم إضافة الخدمة محلياً');
+    }
+  };
+
+  const deleteService = async (id: string) => {
+    try {
+      await servicesService.delete(id);
+      setServices(prev => prev.filter(s => s.id !== id));
+      toast.success('تم حذف الخدمة بنجاح');
+    } catch (err) {
+      setServices(prev => prev.filter(s => s.id !== id));
+      toast.success('تم حذف الخدمة محلياً');
+    }
+  };
+
+  // إدارة طرق الدفع
+  const updatePaymentMethod = async (id: string, method: Partial<PaymentMethod>) => {
+    try {
+      await paymentMethodsService.update(id, method);
+      setPaymentMethods(prev => prev.map(p => p.id === id ? { ...p, ...method } : p));
+      toast.success('تم تحديث طريقة الدفع بنجاح');
+    } catch (err) {
+      toast.error('فشل في تحديث طريقة الدفع');
+    }
+  };
+
+  const addPaymentMethod = async (method: Omit<PaymentMethod, 'id'>) => {
+    try {
+      const newMethod = await paymentMethodsService.create(method);
+      setPaymentMethods(prev => [...prev, newMethod]);
+      toast.success('تم إضافة طريقة الدفع بنجاح');
+    } catch (err) {
+      const newMethod = { ...method, id: Date.now().toString() };
+      setPaymentMethods(prev => [...prev, newMethod]);
+      toast.success('تم إضافة طريقة الدفع محلياً');
+    }
+  };
+
+  const deletePaymentMethod = async (id: string) => {
+    try {
+      await paymentMethodsService.delete(id);
+      setPaymentMethods(prev => prev.filter(p => p.id !== id));
+      toast.success('تم حذف طريقة الدفع بنجاح');
+    } catch (err) {
+      setPaymentMethods(prev => prev.filter(p => p.id !== id));
+      toast.success('تم حذف طريقة الدفع محلياً');
+    }
+  };
+
+  // إدارة إعدادات الموقع
+  const updateSiteSettings = async (settings: Partial<SiteSettings>) => {
+    try {
+      await siteSettingsService.update(settings);
+      setSiteSettings(prev => ({ ...prev, ...settings }));
+      toast.success('تم تحديث إعدادات الموقع بنجاح');
+    } catch (err) {
+      setSiteSettings(prev => ({ ...prev, ...settings }));
+      toast.success('تم تحديث الإعدادات محلياً');
+    }
+  };
+
   useEffect(() => {
     refreshData();
   }, []);
