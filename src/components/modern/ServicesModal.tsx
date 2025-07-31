@@ -7,6 +7,7 @@ import {
 import { useData } from '../../context/DataContext';
 import Button from '../ui/Button';
 import Card from '../ui/Card';
+import ServiceCard from './ServiceCard';
 
 interface ServicesModalProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ const ServicesModal: React.FC<ServicesModalProps> = ({ isOpen, onClose }) => {
     return DollarSign;
   };
 
-  // تحديد اللون حسب نوع الخدمة
+  // تحديد ��للون حسب نوع الخدمة
   const getServiceColor = (serviceName: string) => {
     if (serviceName.includes('PayPal') || serviceName.includes('Wise')) return 'from-blue-500 to-blue-600';
     if (serviceName.includes('Bitcoin') || serviceName.includes('Okx') || serviceName.includes('Bybit')) return 'from-yellow-500 to-orange-500';
@@ -311,7 +312,7 @@ const ServicesModal: React.FC<ServicesModalProps> = ({ isOpen, onClose }) => {
                   size="md"
                   onClick={onClose}
                 >
-                  إلغاء
+                  ��لغاء
                 </Button>
                 
                 <Button
