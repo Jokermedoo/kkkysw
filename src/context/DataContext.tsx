@@ -21,6 +21,12 @@ export interface SiteSettings {
   title: string;
   description: string;
   orderNotice: string;
+  customization?: string; // JSON string for custom settings
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  whatsappNumber?: string;
+  emailAddress?: string;
 }
 
 export interface Order {
