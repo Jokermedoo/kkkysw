@@ -8,6 +8,7 @@ import StatsCard from './StatsCard';
 import TrustSection from './TrustSection';
 import FloatingWhatsApp from './FloatingWhatsApp';
 import MarketingElements from './MarketingElements';
+import DatabaseTest from './DatabaseTest';
 
 const LandingPage: React.FC = () => {
   const { services, paymentMethods, siteSettings, orders, loading, error, refreshData } = useData();
@@ -452,7 +453,7 @@ const LandingPage: React.FC = () => {
                 <li><a href="#services" className="hover:text-white transition-colors">المحافظ الرقمية</a></li>
                 <li><a href="#services" className="hover:text-white transition-colors">منصات التداول</a></li>
                 <li><a href="#services" className="hover:text-white transition-colors">الخدمات المحلية</a></li>
-                <li><a href="#services" className="hover:text-white transition-colors">سحب الأرباح</a></li>
+                <li><a href="#services" className="hover:text-white transition-colors">سحب ا��أرباح</a></li>
               </ul>
             </div>
             
